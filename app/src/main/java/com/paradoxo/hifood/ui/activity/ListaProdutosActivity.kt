@@ -32,7 +32,7 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
     }
 
     private fun configuraFab() {
-        val fab = binding.activityListaProdutosFab
+        val fab = binding.activityListaProdutosExtendFab
         fab.setOnClickListener {
             vaiParaFormularioProduto()
         }
