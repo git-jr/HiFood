@@ -3,6 +3,7 @@ package com.paradoxo.hifood.ui.activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +51,13 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
     private fun configuraRecyclerView() {
         val recyclerView = binding.activityListaProdutosRecyclerView
         recyclerView.adapter = adapter
+        adapter.quandoClicaNoItemLister = { produto ->
+            Log.i("ListaProdutosActivityr", "Clicando no item")
+
+            val intent: Intent = Intent(this, DetalhesProdutoActivity::class.java)
+            intent.putExtra("produto", produto)
+            startActivity(intent)
+        }
     }
 
 }
