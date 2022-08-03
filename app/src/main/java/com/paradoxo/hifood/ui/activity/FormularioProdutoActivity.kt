@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.dao.ProdutoDAO
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
+import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
+import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
 import java.math.BigDecimal
 
 class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario_produto) {
@@ -14,12 +16,20 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
 
+    private var url: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         configuraBotaoSalvar()
         setContentView(binding.root)
-
+        binding.activityFormularioProdutoImagem.setOnClickListener {
+            FormularioImagemDialog(this).mostra(url) { imagem ->
+                url = imagem
+                binding.activityFormularioProdutoImagem.tentaCarregarImagem(imagem)
+            }
+        }
     }
+
 
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
@@ -48,7 +58,8 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
         return Produto(
             nome = nome,
             descricao = descricao,
-            valor = valor
+            valor = valor,
+            imagem = url
         )
     }
 

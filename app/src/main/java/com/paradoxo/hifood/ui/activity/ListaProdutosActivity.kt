@@ -1,11 +1,15 @@
 package com.paradoxo.hifood.ui.activity
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.dao.ProdutoDAO
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
+import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 
 class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos) {
@@ -22,10 +26,10 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         configuraRecyclerView()
         configuraFab()
     }
+
     override fun onResume() {
         super.onResume()
         adapter.atualiza(dao.buscaTodo())
