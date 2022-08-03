@@ -20,6 +20,7 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        title = "Cadastrar Produto"
         configuraBotaoSalvar()
         setContentView(binding.root)
         binding.activityFormularioProdutoImagem.setOnClickListener {
