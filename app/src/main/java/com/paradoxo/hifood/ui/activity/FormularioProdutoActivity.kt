@@ -3,7 +3,8 @@ package com.paradoxo.hifood.ui.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.paradoxo.hifood.R
-import com.paradoxo.hifood.dao.ProdutoDAO
+import com.paradoxo.hifood.database.AppDatabase
+import com.paradoxo.hifood.database.dao.ProdutoDAO
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
@@ -17,6 +18,12 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
     }
 
     private var url: String? = null
+    private var produtoId = 0L
+    private val produtoDao: ProdutoDAO by lazy {
+        val db = AppDatabase.instancia(this)
+        db.produtoDao()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +36,45 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
                 binding.activityFormularioProdutoImagem.tentaCarregarImagem(imagem)
             }
         }
+
+        tentaCarregarProduto()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        tentaBuscarProduto()
+    }
+
+    private fun tentaBuscarProduto() {
+        produtoDao.buscaPorId(produtoId)?.let {
+            title = "Alterar produto"
+            preencheCampos(it)
+        }
+    }
+
+    private fun tentaCarregarProduto() {
+        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
+    }
+
+    private fun preencheCampos(produto: Produto) {
+        url = produto.imagem
+        binding.activityFormularioProdutoImagem
+            .tentaCarregarImagem(produto.imagem)
+        binding.activityFormularioProdutoNome
+            .setText(produto.nome)
+        binding.activityFormularioProdutoDescricao
+            .setText(produto.descricao)
+        binding.activityFormularioProdutoValor
+            .setText(produto.valor.toPlainString())
     }
 
 
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
-        val dao = ProdutoDAO()
+
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-            dao.adiciona(produtoNovo)
+            produtoDao.salva(produtoNovo)
             finish()
         }
     }
@@ -57,6 +94,7 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
         }
 
         return Produto(
+            id = produtoId,
             nome = nome,
             descricao = descricao,
             valor = valor,

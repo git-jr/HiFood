@@ -1,28 +1,16 @@
 package com.paradoxo.hifood.ui.activity
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.Room
 import com.paradoxo.hifood.R
-import com.paradoxo.hifood.dao.ProdutoDAO
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
-import com.paradoxo.hifood.model.Produto
-import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
-import java.math.BigDecimal
 
 class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos) {
-    private val dao = ProdutoDAO()
-    private val adapter = ListaProdutosAdapter(
-        this,
-        dao.buscaTodo()
-    )
+    private val adapter = ListaProdutosAdapter(this)
 
     private val binding by lazy {
         ActivityListaProdutosBinding.inflate(layoutInflater)
@@ -34,27 +22,16 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
         configuraRecyclerView()
         configuraFab()
 
-
-        val db = Room.databaseBuilder(
-            this, AppDatabase::class.java, "hifood.db"
-        ).allowMainThreadQueries()
-            .build()
-
-        val produtoDao = db.produtoDao()
-//        produtoDao.salva(
-//            Produto(
-//                nome = "teste nome 3",
-//                descricao = "teste de descrição",
-//                valor = BigDecimal("10.0")
-//            )
-//        )
-
-        adapter.atualiza(produtoDao.buscaTodos())
     }
 
     override fun onResume() {
         super.onResume()
-//        adapter.atualiza(dao.buscaTodo())
+
+        val db = AppDatabase.instancia(this)
+
+        val produtoDao = db.produtoDao()
+
+        adapter.atualiza(produtoDao.buscaTodos())
     }
 
     private fun configuraFab() {
@@ -75,8 +52,8 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
         adapter.quandoClicaNoItemLister = { produto ->
             Log.i("ListaProdutosActivityr", "Clicando no item")
 
-            val intent: Intent = Intent(this, DetalhesProdutoActivity::class.java)
-            intent.putExtra("produto", produto)
+            val intent = Intent(this, DetalhesProdutoActivity::class.java)
+            intent.putExtra(CHAVE_PRODUTO_ID, produto.id)
             startActivity(intent)
         }
     }
