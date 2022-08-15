@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityDetalhesProdutoBinding
 import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
+import kotlinx.coroutines.launch
 
 class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_produto) {
 
@@ -36,10 +38,13 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
     }
 
     private fun buscaProduto() {
-        produto = produtoDao.buscaPorId(produtoId)
-        produto?.let {
-            carregaProdutoNaTela(it)
-        } ?: finish()
+
+        lifecycleScope.launch {
+            produto = produtoDao.buscaPorId(produtoId)
+            produto?.let {
+                carregaProdutoNaTela(it)
+            } ?: finish()
+        }
     }
 
     fun tentarCarregarProduto() {
@@ -60,7 +65,9 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
                 }
             }
             R.id.menu_detalhes_produto_remover -> {
-                produto?.let { produtoDao.remove(it) }
+                lifecycleScope.launch {
+                    produto?.let { produtoDao.remove(it) }
+                }
                 finish()
             }
         }

@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
+import kotlinx.coroutines.launch
 
 class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos) {
     private val adapter = ListaProdutosAdapter(this)
@@ -15,6 +17,12 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
     private val binding by lazy {
         ActivityListaProdutosBinding.inflate(layoutInflater)
     }
+
+    private val dao by lazy {
+        val db = AppDatabase.instancia(this)
+        db.produtoDao()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +35,13 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
     override fun onResume() {
         super.onResume()
 
-        val db = AppDatabase.instancia(this)
+        lifecycleScope.launch {
+            val produtos = dao.buscaTodos()
+            adapter.atualiza(produtos)
 
-        val produtoDao = db.produtoDao()
-
-        adapter.atualiza(produtoDao.buscaTodos())
+        }
     }
+
 
     private fun configuraFab() {
         val fab = binding.activityListaProdutosExtendFab

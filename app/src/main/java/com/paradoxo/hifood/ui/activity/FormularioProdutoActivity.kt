@@ -2,6 +2,7 @@ package com.paradoxo.hifood.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.database.dao.ProdutoDAO
@@ -9,6 +10,7 @@ import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario_produto) {
@@ -46,9 +48,11 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
     }
 
     private fun tentaBuscarProduto() {
-        produtoDao.buscaPorId(produtoId)?.let {
-            title = "Alterar produto"
-            preencheCampos(it)
+        lifecycleScope.launch {
+            produtoDao.buscaPorId(produtoId)?.let {
+                title = "Alterar produto"
+                preencheCampos(it)
+            }
         }
     }
 
@@ -74,7 +78,10 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
 
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
-            produtoDao.salva(produtoNovo)
+
+            lifecycleScope.launch {
+                produtoDao.salva(produtoNovo)
+            }
             finish()
         }
     }

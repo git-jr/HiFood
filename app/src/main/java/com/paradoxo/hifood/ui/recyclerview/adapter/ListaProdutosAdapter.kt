@@ -1,24 +1,14 @@
 package com.paradoxo.hifood.ui.recyclerview.adapter
 
 import android.content.Context
-import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.load
-import com.paradoxo.hifood.R
 import com.paradoxo.hifood.databinding.ProdutoItemBinding
 import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
-import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.*
 
 class ListaProdutosAdapter(
     private val context: Context,
