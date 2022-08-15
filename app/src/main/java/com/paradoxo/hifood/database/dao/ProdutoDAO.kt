@@ -2,12 +2,13 @@ package com.paradoxo.hifood.database.dao
 
 import androidx.room.*
 import com.paradoxo.hifood.model.Produto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProdutoDAO {
 
     @Query("SELECT * FROM Produto")
-    suspend fun buscaTodos(): List<Produto>
+    fun buscaTodos(): Flow<List<Produto>> // Ao usar Flow como retorno, tirar o Suspend que passa a ser "tranalho" do collect desse emit
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun salva(produto: Produto)
@@ -16,5 +17,5 @@ interface ProdutoDAO {
     suspend fun remove(produto: Produto)
 
     @Query("SELECT * FROM Produto WHERE id = :id")
-    suspend fun buscaPorId(id: Long): Produto?
+    fun buscaPorId(id: Long): Flow<Produto?>
 }

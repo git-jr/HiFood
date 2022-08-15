@@ -49,9 +49,12 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
 
     private fun tentaBuscarProduto() {
         lifecycleScope.launch {
-            produtoDao.buscaPorId(produtoId)?.let {
-                title = "Alterar produto"
-                preencheCampos(it)
+
+            produtoDao.buscaPorId(produtoId).collect { produto ->
+                produto?.let {
+                    title = "Alterar produto"
+                    preencheCampos(it)
+                }
             }
         }
     }

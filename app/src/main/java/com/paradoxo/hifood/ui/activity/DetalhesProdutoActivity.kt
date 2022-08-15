@@ -40,10 +40,12 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
     private fun buscaProduto() {
 
         lifecycleScope.launch {
-            produto = produtoDao.buscaPorId(produtoId)
-            produto?.let {
-                carregaProdutoNaTela(it)
-            } ?: finish()
+            produtoDao.buscaPorId(produtoId).collect { produto ->
+                produto?.let {
+                    carregaProdutoNaTela(it)
+                } ?: finish()
+            }
+
         }
     }
 

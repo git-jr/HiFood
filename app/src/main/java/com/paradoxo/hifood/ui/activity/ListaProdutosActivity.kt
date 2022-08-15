@@ -9,6 +9,9 @@ import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos) {
@@ -30,16 +33,28 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
         configuraRecyclerView()
         configuraFab()
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-
         lifecycleScope.launch {
-            val produtos = dao.buscaTodos()
-            adapter.atualiza(produtos)
+            dao.buscaTodos().collect { produtos ->
+                adapter.atualiza(produtos)
+            }
 
         }
+
+// Exemplo de uso do Flow com Coroutines
+//        val fluxoDeNumeros = flow {
+//            repeat(100) {
+//                emit(it)
+//                delay(1000)
+//            }
+//
+//        }
+//        lifecycleScope.launch {
+//            fluxoDeNumeros.collect() { numeroEmitido ->
+//                Log.i("O fluxo", "$numeroEmitido")
+//            }
+//        }
+
+
     }
 
 
