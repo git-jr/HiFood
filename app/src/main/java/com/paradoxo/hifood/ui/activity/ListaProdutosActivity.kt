@@ -9,9 +9,6 @@ import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos) {
@@ -53,7 +50,6 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
 //                Log.i("O fluxo", "$numeroEmitido")
 //            }
 //        }
-
 
     }
 

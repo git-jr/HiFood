@@ -16,7 +16,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun produtoDao(): ProdutoDAO
 
     companion object {
-        @Volatile private var db: AppDatabase? = null
+        @Volatile
+        private var db: AppDatabase? = null
         fun instancia(context: Context): AppDatabase {
 
             /* Para fins de estudo, o código a seguir retorna o db direto se ele não for nulo.
@@ -24,7 +25,8 @@ abstract class AppDatabase : RoomDatabase() {
             Singleton criado!
             */
             return db ?: Room.databaseBuilder(
-                context, AppDatabase::class.java, "hifood.db"
+                context,
+                AppDatabase::class.java, "hifood.db"
             ).build()
                 .also {
                     db = it

@@ -16,16 +16,26 @@
         android:theme="@style/Theme.HiFood"
         tools:targetApi="31">
         <activity
-            android:name=".ui.activity.DetalhesProdutoActivity"
-            android:exported="false" />
+            android:name=".ui.activity.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activity.FormularioProdutoActivity"
-            android:exported="true" />
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.DetalhesProdutoActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.activity.ListaProdutosActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
