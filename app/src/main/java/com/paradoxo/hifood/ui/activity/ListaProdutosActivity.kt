@@ -18,11 +18,14 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
         ActivityListaProdutosBinding.inflate(layoutInflater)
     }
 
-    private val dao by lazy {
+    private val produtoDAO by lazy {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }
 
+    private val usuarioDAO by lazy {
+        AppDatabase.instancia(this).usuarioDao()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +34,16 @@ class ListaProdutosActivity : AppCompatActivity(R.layout.activity_lista_produtos
         configuraFab()
 
         lifecycleScope.launch {
-            dao.buscaTodos().collect { produtos ->
-                adapter.atualiza(produtos)
+            launch {
+                produtoDAO.buscaTodos().collect { produtos ->
+                    adapter.atualiza(produtos)
+                }
+            }
+
+            intent.getStringExtra("CHAVE_USUARIO_ID")?.let { usuarioID ->
+                usuarioDAO.buscaPorID(usuarioID).collect {
+                    Log.i("Lista Produtos", "onCreate: $it")
+                }
             }
 
         }

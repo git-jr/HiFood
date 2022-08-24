@@ -7,13 +7,25 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.paradoxo.hifood.database.converter.Converters
 import com.paradoxo.hifood.database.dao.ProdutoDAO
+import com.paradoxo.hifood.database.dao.UsuarioDao
 import com.paradoxo.hifood.model.Produto
+import com.paradoxo.hifood.model.Usuario
 
 
-@Database(entities = [Produto::class], version = 1, exportSchema = true)
+@Database(
+    entities = [
+        Produto::class,
+        Usuario::class
+    ],
+
+    version = 2,
+    exportSchema = true
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
+
     abstract fun produtoDao(): ProdutoDAO
+    abstract fun usuarioDao(): UsuarioDao
 
     companion object {
         @Volatile
@@ -27,7 +39,8 @@ abstract class AppDatabase : RoomDatabase() {
             return db ?: Room.databaseBuilder(
                 context,
                 AppDatabase::class.java, "hifood.db"
-            ).build()
+            ).addMigrations(MIGRATION_1_2)
+                .build()
                 .also {
                     db = it
                 }
