@@ -15,4 +15,9 @@
 
         <item name="android:fontFamily">@font/montserrat_alternates</item>
     </style>
+
+    <style name="Theme.HiFood.NoActionBar" parent="Theme.HiFood">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

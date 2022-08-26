@@ -4,10 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityLoginBinding
+import com.paradoxo.hifood.extensions.toast
 import com.paradoxo.hifood.extensions.vaiPara
+import com.paradoxo.hifood.preferences.dataStore
+import com.paradoxo.hifood.preferences.usarioLogadoPreferences
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -32,18 +37,19 @@ class LoginActivity : AppCompatActivity() {
         binding.activityLoginBotaoEntrar.setOnClickListener {
             val usuario = binding.activityLoginUsuario.text.toString()
             val senha = binding.activityLoginSenha.text.toString()
-            Log.i("LoginActivity", "onCreate: $usuario - $senha")
-            lifecycleScope.launch {
-                usuarioDAO.autentica(usuario, senha)?.let { usuario ->
-                    vaiPara(ListaProdutosActivity::class.java) {
-                        putExtra("CHAVE_USUARIO_ID", usuario.id)
-                    }
-                } ?: Toast.makeText(
-                    this@LoginActivity,
-                    "Falha na atenticação",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            autentica(usuario, senha)
+        }
+    }
+
+    private fun autentica(usuario: String, senha: String) {
+        lifecycleScope.launch {
+            usuarioDAO.autentica(usuario, senha)?.let { usuario ->
+                dataStore.edit { preferences ->
+                    preferences[usarioLogadoPreferences] = usuario.id
+                }
+                vaiPara(ListaProdutosActivity::class.java)
+                finish()
+            } ?: toast("Falha na atenticação")
         }
     }
 

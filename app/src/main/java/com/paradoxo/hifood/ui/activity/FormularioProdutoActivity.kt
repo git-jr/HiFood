@@ -1,19 +1,19 @@
 package com.paradoxo.hifood.ui.activity
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.database.dao.ProdutoDAO
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario_produto) {
+class FormularioProdutoActivity : UsuarioBaseActivity() {
 
     private val binding by lazy {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
@@ -24,6 +24,10 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
     private val produtoDao: ProdutoDAO by lazy {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
+    }
+
+    private val usuarioDAO by lazy {
+        AppDatabase.instancia(this).usuarioDao()
     }
 
 
@@ -40,6 +44,13 @@ class FormularioProdutoActivity : AppCompatActivity(R.layout.activity_formulario
         }
 
         tentaCarregarProduto()
+        lifecycleScope.launch {
+            usuario
+                .filterNotNull()
+                .collect() {
+                    Log.i("Formulario Proudto", "onCreate: $it")
+                }
+        }
     }
 
     override fun onResume() {

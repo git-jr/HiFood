@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_lista_produtos_sair_do_app"
+        android:icon="@drawable/ic_action_sair_do_app"
+        android:title="Sair do App"
+        app:showAsAction="ifRoom" />
+</menu>
