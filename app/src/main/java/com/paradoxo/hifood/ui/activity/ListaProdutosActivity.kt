@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
+import com.paradoxo.hifood.model.Usuario
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -35,9 +36,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
             launch {
                 usuario
                     .filterNotNull()
-                    .collect() {
-                        Log.i("Lista produtos", "onCreate: $it")
-                        buscaProdutosUsuario()
+                    .collect() { usuario ->
+                        buscaProdutosUsuario(usuario.id)
                     }
             }
         }
@@ -62,8 +62,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
     }
 
 
-    private suspend fun buscaProdutosUsuario() {
-        produtoDAO.buscaTodos().collect { produtos ->
+    private suspend fun buscaProdutosUsuario(usuarioId: String) {
+        produtoDAO.buscaTodosdDoUsuario(usuarioId).collect { produtos ->
             adapter.atualiza(produtos)
         }
     }

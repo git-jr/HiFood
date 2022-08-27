@@ -18,7 +18,7 @@ import com.paradoxo.hifood.model.Usuario
         Usuario::class
     ],
 
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -39,8 +39,10 @@ abstract class AppDatabase : RoomDatabase() {
             return db ?: Room.databaseBuilder(
                 context,
                 AppDatabase::class.java, "hifood.db"
-            ).addMigrations(MIGRATION_1_2)
-                .build()
+            ).addMigrations(
+                MIGRATION_1_2,
+                MIGARTION_2_3
+            ).build()
                 .also {
                     db = it
                 }

@@ -9,7 +9,9 @@ import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -44,13 +46,6 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
         }
 
         tentaCarregarProduto()
-        lifecycleScope.launch {
-            usuario
-                .filterNotNull()
-                .collect() {
-                    Log.i("Formulario Proudto", "onCreate: $it")
-                }
-        }
     }
 
     override fun onResume() {
@@ -91,16 +86,18 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
 
         botaoSalvar.setOnClickListener {
-            val produtoNovo = criaProduto()
-
             lifecycleScope.launch {
-                produtoDao.salva(produtoNovo)
+                usuario.value?.let { usuario ->
+                    val produtoNovo = criaProduto(usuario.id)
+                    produtoDao.salva(produtoNovo)
+                    finish()
+                }
             }
-            finish()
+
         }
     }
 
-    private fun criaProduto(): Produto {
+    private fun criaProduto(usuarioId: String): Produto {
         val campoNome = binding.activityFormularioProdutoNome
         val nome = campoNome.text.toString()
         val campoDescricaoa = binding.activityFormularioProdutoDescricao
@@ -119,7 +116,8 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
             nome = nome,
             descricao = descricao,
             valor = valor,
-            imagem = url
+            imagem = url,
+            usuarioId = usuarioId
         )
     }
 
