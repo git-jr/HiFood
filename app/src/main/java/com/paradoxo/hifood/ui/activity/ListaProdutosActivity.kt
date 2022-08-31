@@ -11,6 +11,8 @@ import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.model.Usuario
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
+import com.paradoxo.hifood.webclient.RetrofitInit
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -39,6 +41,15 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
                     .collect() { usuario ->
                         buscaProdutosUsuario(usuario.id)
                     }
+            }
+        }
+
+        lifecycleScope.launch(IO) {
+            val produtoService = RetrofitInit().produtoService
+            val call = produtoService.buscaTodos()
+            val respota = call.execute()
+            respota.body()?.let {
+                Log.i("Lista Produtos Firebase", "onCreate: $it")
             }
         }
 
