@@ -11,10 +11,15 @@ import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.model.Usuario
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
+import com.paradoxo.hifood.webclient.ProdutoWebClient
 import com.paradoxo.hifood.webclient.RetrofitInit
+import com.paradoxo.hifood.webclient.model.ProdutoResposta
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ListaProdutosActivity : UsuarioBaseActivity() {
 
@@ -28,6 +33,10 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         db.produtoDao()
     }
 
+    private val webClient by lazy {
+        ProdutoWebClient()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -35,6 +44,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         configuraFab()
 
         lifecycleScope.launch {
+            val produtos = webClient.buscaTodos()
+            Log.i("Lista Produtos", "onCreate: Retrofit Coroutines: $produtos")
             launch {
                 usuario
                     .filterNotNull()
@@ -44,15 +55,30 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
             }
         }
 
-        lifecycleScope.launch(IO) {
-            val produtoService = RetrofitInit().produtoService
-            val call = produtoService.buscaTodos()
-            val respota = call.execute()
-            respota.body()?.let {
-                Log.i("Lista Produtos Firebase", "onCreate: $it")
-            }
-        }
 
+    }
+
+    private fun retrofitSemCoroutines() {
+        val call: Call<List<ProdutoResposta?>> = RetrofitInit().produtoService.buscaTodos()
+        lifecycleScope.launch(IO) {
+            call.enqueue(object : Callback<List<ProdutoResposta?>?> {
+                override fun onResponse(
+                    call: Call<List<ProdutoResposta?>?>,
+                    respota: Response<List<ProdutoResposta?>?>
+                ) {
+                    respota.body()?.let { produtosResposta ->
+                        val produtos = produtosResposta.map {
+                            it?.produto
+                        }
+                        Log.i("Lista Produtos Firebase", "onCreate: $produtos")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<ProdutoResposta?>?>, t: Throwable) {
+                    Log.i("Lista Produtos Firebase", "onFailure: ", t)
+                }
+            })
+        }
     }
 
 

@@ -16,3 +16,4 @@ data class Produto(
     val imagem: String? = null,
     val usuarioId: String? = null
 ) : Parcelable
+
