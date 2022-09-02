@@ -15,7 +15,7 @@ class ProdutoResposta(
 
     val produto: Produto
         get() = Produto(
-            id = 0,
+            id = id?.toLong() ?: 0L,
             nome = nome ?: "",
             descricao = descricao ?: "",
             valor = BigDecimal(valor.toString()),

@@ -1,17 +1,13 @@
 package com.paradoxo.hifood.ui.activity
 
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.database.AppDatabase
-import com.paradoxo.hifood.database.dao.ProdutoDAO
+import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -23,7 +19,7 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
 
     private var url: String? = null
     private var produtoId = 0L
-    private val produtoDao: ProdutoDAO by lazy {
+    private val produtoDao: ProdutoDao by lazy {
         val db = AppDatabase.instancia(this)
         db.produtoDao()
     }

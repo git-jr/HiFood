@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.model.Usuario
+import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.paradoxo.hifood.webclient.ProdutoWebClient
 import com.paradoxo.hifood.webclient.RetrofitInit
@@ -28,13 +31,11 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         ActivityListaProdutosBinding.inflate(layoutInflater)
     }
 
-    private val produtoDAO by lazy {
-        val db = AppDatabase.instancia(this)
-        db.produtoDao()
-    }
-
-    private val webClient by lazy {
-        ProdutoWebClient()
+    private val repository by lazy {
+        ProdutoRepository(
+            AppDatabase.instancia(this).produtoDao(),
+            ProdutoWebClient()
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +45,12 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         configuraFab()
 
         lifecycleScope.launch {
-            val produtos = webClient.buscaTodos()
-            Log.i("Lista Produtos", "onCreate: Retrofit Coroutines: $produtos")
             launch {
+                atualizaTodos()
+            }
+
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repository.buscaTodos()
                 usuario
                     .filterNotNull()
                     .collect() { usuario ->
@@ -58,29 +62,9 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
     }
 
-    private fun retrofitSemCoroutines() {
-        val call: Call<List<ProdutoResposta?>> = RetrofitInit().produtoService.buscaTodos()
-        lifecycleScope.launch(IO) {
-            call.enqueue(object : Callback<List<ProdutoResposta?>?> {
-                override fun onResponse(
-                    call: Call<List<ProdutoResposta?>?>,
-                    respota: Response<List<ProdutoResposta?>?>
-                ) {
-                    respota.body()?.let { produtosResposta ->
-                        val produtos = produtosResposta.map {
-                            it?.produto
-                        }
-                        Log.i("Lista Produtos Firebase", "onCreate: $produtos")
-                    }
-                }
-
-                override fun onFailure(call: Call<List<ProdutoResposta?>?>, t: Throwable) {
-                    Log.i("Lista Produtos Firebase", "onFailure: ", t)
-                }
-            })
-        }
+    private suspend fun atualizaTodos() {
+        repository.atualizaTodos()
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_lista_produtos, menu)
@@ -100,7 +84,7 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
 
     private suspend fun buscaProdutosUsuario(usuarioId: String) {
-        produtoDAO.buscaTodosdDoUsuario(usuarioId).collect { produtos ->
+        repository.buscaTodosdDoUsuario(usuarioId).collect { produtos ->
             adapter.atualiza(produtos)
         }
     }

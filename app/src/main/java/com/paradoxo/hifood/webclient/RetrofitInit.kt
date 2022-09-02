@@ -9,7 +9,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 class RetrofitInit {
     private val retrofit = Retrofit.Builder()
         .baseUrl(FIREBASE_URL_BASE)
-        .addConverterFactory(MoshiConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     val produtoService = retrofit.create(ProdutoService::class.java)

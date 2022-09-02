@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.paradoxo.hifood.database.converter.Converters
-import com.paradoxo.hifood.database.dao.ProdutoDAO
+import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.database.dao.UsuarioDao
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.model.Usuario
@@ -24,7 +24,7 @@ import com.paradoxo.hifood.model.Usuario
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun produtoDao(): ProdutoDAO
+    abstract fun produtoDao(): ProdutoDao
     abstract fun usuarioDao(): UsuarioDao
 
     companion object {
