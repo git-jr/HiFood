@@ -25,4 +25,14 @@ class ProdutoRepository(
     fun buscaTodosdDoUsuario(usuarioId: String): Flow<List<Produto>> {
         return dao.buscaTodosdDoUsuario(usuarioId)
     }
+
+    fun buscaPorId(id: String): Flow<Produto?> {
+        return dao.buscaPorId(id)
+
+    }
+
+    suspend fun salva(produto: Produto) {
+        dao.salva(produto)
+        webClient.salva(produto)
+    }
 }

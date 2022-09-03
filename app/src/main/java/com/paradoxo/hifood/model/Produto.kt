@@ -5,11 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 import java.math.BigDecimal
+import java.util.*
 
 @Entity
 @Parcelize
 data class Produto(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val nome: String,
     val descricao: String,
     val valor: BigDecimal,

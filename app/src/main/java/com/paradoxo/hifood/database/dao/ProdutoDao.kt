@@ -24,6 +24,6 @@ interface ProdutoDao {
     suspend fun remove(produto: Produto)
 
     @Query("SELECT * FROM Produto WHERE id = :id")
-    fun buscaPorId(id: Long): Flow<Produto?>
+    fun buscaPorId(id: String): Flow<Produto?>
 
 }

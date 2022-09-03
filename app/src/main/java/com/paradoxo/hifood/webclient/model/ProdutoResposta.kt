@@ -2,6 +2,7 @@ package com.paradoxo.hifood.webclient.model
 
 import com.paradoxo.hifood.model.Produto
 import java.math.BigDecimal
+import java.util.*
 
 
 class ProdutoResposta(
@@ -15,7 +16,7 @@ class ProdutoResposta(
 
     val produto: Produto
         get() = Produto(
-            id = id?.toLong() ?: 0L,
+            id = id ?: UUID.randomUUID().toString(),
             nome = nome ?: "",
             descricao = descricao ?: "",
             valor = BigDecimal(valor.toString()),

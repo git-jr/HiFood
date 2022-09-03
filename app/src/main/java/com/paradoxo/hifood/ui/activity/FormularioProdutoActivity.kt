@@ -7,7 +7,9 @@ import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
+import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
+import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -18,16 +20,14 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
     }
 
     private var url: String? = null
-    private var produtoId = 0L
-    private val produtoDao: ProdutoDao by lazy {
-        val db = AppDatabase.instancia(this)
-        db.produtoDao()
-    }
+    private var produtoId: String? = null
 
-    private val usuarioDAO by lazy {
-        AppDatabase.instancia(this).usuarioDao()
+    private val respository by lazy {
+        ProdutoRepository(
+            AppDatabase.instancia(this).produtoDao(),
+            ProdutoWebClient()
+        )
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,17 +52,19 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
     private fun tentaBuscarProduto() {
         lifecycleScope.launch {
 
-            produtoDao.buscaPorId(produtoId).collect { produto ->
-                produto?.let {
-                    title = "Alterar produto"
-                    preencheCampos(it)
+            produtoId?.let { id ->
+                respository.buscaPorId(id).collect { produto ->
+                    produto?.let {
+                        title = "Alterar produto"
+                        preencheCampos(it)
+                    }
                 }
             }
         }
     }
 
     private fun tentaCarregarProduto() {
-        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
+        produtoId = intent.getStringExtra(CHAVE_PRODUTO_ID)
     }
 
     private fun preencheCampos(produto: Produto) {
@@ -85,11 +87,10 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
             lifecycleScope.launch {
                 usuario.value?.let { usuario ->
                     val produtoNovo = criaProduto(usuario.id)
-                    produtoDao.salva(produtoNovo)
-                    finish()
+                    respository.salva(produtoNovo)
                 }
+                finish()
             }
-
         }
     }
 
@@ -107,14 +108,23 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
             BigDecimal(valorEmTexto)
         }
 
-        return Produto(
-            id = produtoId,
+        return produtoId?.let { id ->
+            Produto(
+                id = id,
+                nome = nome,
+                descricao = descricao,
+                valor = valor,
+                imagem = url,
+                usuarioId = usuarioId
+            )
+        } ?: Produto(
             nome = nome,
             descricao = descricao,
             valor = valor,
             imagem = url,
             usuarioId = usuarioId
         )
+
     }
 
 }

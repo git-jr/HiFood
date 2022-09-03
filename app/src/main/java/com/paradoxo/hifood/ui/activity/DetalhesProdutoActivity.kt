@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_produto) {
 
-    private var produtoId: Long = 0L
+    private var produtoId: String? = null
     private var produto: Produto? = null
     private val binding by lazy {
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
@@ -38,19 +38,19 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
     }
 
     private fun buscaProduto() {
-
         lifecycleScope.launch {
-            produtoDao.buscaPorId(produtoId).collect { produto ->
-                produto?.let {
-                    carregaProdutoNaTela(it)
-                } ?: finish()
+            produtoId?.let { id ->
+                produtoDao.buscaPorId(id).collect { produto ->
+                    produto?.let {
+                        carregaProdutoNaTela(it)
+                    } ?: finish()
+                }
             }
-
         }
     }
 
     fun tentarCarregarProduto() {
-        produtoId = intent.getLongExtra(CHAVE_PRODUTO_ID, 0L)
+        produtoId = intent.getStringExtra(CHAVE_PRODUTO_ID)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
