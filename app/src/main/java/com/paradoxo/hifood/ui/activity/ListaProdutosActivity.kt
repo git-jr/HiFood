@@ -11,18 +11,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
-import com.paradoxo.hifood.model.Usuario
 import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.paradoxo.hifood.webclient.ProdutoWebClient
-import com.paradoxo.hifood.webclient.RetrofitInit
-import com.paradoxo.hifood.webclient.model.ProdutoResposta
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ListaProdutosActivity : UsuarioBaseActivity() {
 
@@ -46,7 +39,7 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
         lifecycleScope.launch {
             launch {
-                atualizaTodos()
+                sincroniza()
             }
 
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -62,8 +55,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
     }
 
-    private suspend fun atualizaTodos() {
-        repository.atualizaTodos()
+    private suspend fun sincroniza() {
+        repository.sincroniza()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

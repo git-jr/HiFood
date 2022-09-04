@@ -3,7 +3,9 @@ package com.paradoxo.hifood.webclient
 import android.util.Log
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.webclient.model.ProdutoRequisicao
+import com.paradoxo.hifood.webclient.model.ProdutoResposta
 import com.paradoxo.hifood.webclient.services.ProdutoService
+import retrofit2.Call
 
 private const val TAG = "ProdutoWebClient"
 
@@ -13,19 +15,23 @@ class ProdutoWebClient {
         RetrofitInit().produtoService
 
     suspend fun buscaTodos(): List<Produto?> {
+
         return try {
             val produtoResposta = produtoService
                 .buscaTodas()
-            produtoResposta.filterNotNull().map { produtoResposta ->
+
+            Log.i(TAG, "BuscaTodos:  firebase $produtoResposta")
+
+            produtoResposta.values.map { produtoResposta ->
                 produtoResposta?.produto
             }
         } catch (e: Exception) {
-            Log.i(TAG, "buscaTodos: ")
+            Log.i(TAG, "Erro em buscaTodos: ", e)
             emptyList()
         }
     }
 
-    suspend fun salva(produto: Produto) {
+    suspend fun salva(produto: Produto): Boolean {
         try {
             val resposta = produtoService.salva(
                 produto.id, ProdutoRequisicao(
@@ -36,14 +42,11 @@ class ProdutoWebClient {
                     usuarioId = produto.usuarioId
                 )
             )
-            if (resposta.isSuccessful) {
-                Log.i(TAG, "salva: produto salvo com sucesso")
-            } else {
-                Log.i(TAG, "salva: produto não foi salvo")
-            }
+            return (resposta.isSuccessful)
         } catch (e: Exception) {
             Log.e(TAG, "salva: falha ao tentar salvar", e)
         }
+        return false
     }
 
 }

@@ -26,4 +26,7 @@ interface ProdutoDao {
     @Query("SELECT * FROM Produto WHERE id = :id")
     fun buscaPorId(id: String): Flow<Produto?>
 
+    @Query("SELECT * FROM Produto WHERE sincronizado = 0")
+    fun buscaNaoSincronizados(): Flow<List<Produto>>
+
 }

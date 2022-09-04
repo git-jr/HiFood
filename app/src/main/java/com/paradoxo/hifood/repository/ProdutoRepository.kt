@@ -5,6 +5,9 @@ import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlin.math.sin
 
 class ProdutoRepository(
     private val dao: ProdutoDao,
@@ -15,10 +18,13 @@ class ProdutoRepository(
         return dao.buscaTodos()
     }
 
-    suspend fun atualizaTodos() {
+    private suspend fun atualizaTodos() {
         webClient.buscaTodos().let { produtos ->
             Log.i("webClient.buscaTodos", "atualizaTodos: $produtos")
-            dao.salva(produtos)
+            val produtosSincronizados = produtos.map { produto ->
+                produto?.copy(sincronizado = true)
+            }
+            dao.salva(produtosSincronizados)
         }
     }
 
@@ -28,11 +34,21 @@ class ProdutoRepository(
 
     fun buscaPorId(id: String): Flow<Produto?> {
         return dao.buscaPorId(id)
-
     }
 
     suspend fun salva(produto: Produto) {
         dao.salva(produto)
-        webClient.salva(produto)
+        if (webClient.salva(produto)) {
+            val produtoSincronizado = produto.copy(sincronizado = true)
+            dao.salva(produtoSincronizado)
+        }
+    }
+
+    suspend fun sincroniza() {
+        val produtosNaoSincronizadas = dao.buscaNaoSincronizados().first()
+        produtosNaoSincronizadas.forEach { produtoNaoSincronizado ->
+            salva(produtoNaoSincronizado)
+        }
+        atualizaTodos()
     }
 }

@@ -19,7 +19,7 @@ class ProdutoResposta(
             id = id ?: UUID.randomUUID().toString(),
             nome = nome ?: "",
             descricao = descricao ?: "",
-            valor = BigDecimal(valor.toString()),
+            valor = BigDecimal(valor),
             imagem = imagem ?: "",
             usuarioId = usuarioId ?: ""
         )

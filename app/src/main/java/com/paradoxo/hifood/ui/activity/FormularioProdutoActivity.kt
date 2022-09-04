@@ -122,7 +122,8 @@ class FormularioProdutoActivity : UsuarioBaseActivity() {
             descricao = descricao,
             valor = valor,
             imagem = url,
-            usuarioId = usuarioId
+            usuarioId = usuarioId,
+            sincronizado = false
         )
 
     }

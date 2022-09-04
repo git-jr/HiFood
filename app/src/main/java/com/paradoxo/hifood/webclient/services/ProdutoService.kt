@@ -15,7 +15,7 @@ interface ProdutoService {
     fun buscaTodos(): Call<List<ProdutoResposta?>>
 
     @GET("produtos.json")
-    suspend fun buscaTodas(): List<ProdutoResposta?>
+    suspend fun buscaTodas(): Map<String,ProdutoResposta?>
 
     @PUT("produtos/{id}.json")
     suspend fun salva(

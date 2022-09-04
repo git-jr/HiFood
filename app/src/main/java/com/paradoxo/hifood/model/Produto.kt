@@ -1,6 +1,7 @@
 package com.paradoxo.hifood.model
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
@@ -15,6 +16,8 @@ data class Produto(
     val descricao: String,
     val valor: BigDecimal,
     val imagem: String? = null,
-    val usuarioId: String? = null
+    val usuarioId: String? = null,
+    @ColumnInfo(defaultValue = "0")
+    val sincronizado: Boolean = false
 ) : Parcelable
 
