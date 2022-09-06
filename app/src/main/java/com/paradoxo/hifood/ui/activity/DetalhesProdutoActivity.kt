@@ -12,6 +12,8 @@ import com.paradoxo.hifood.databinding.ActivityDetalhesProdutoBinding
 import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
+import com.paradoxo.hifood.repository.ProdutoRepository
+import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.launch
 
 class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_produto) {
@@ -22,8 +24,11 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
     }
 
-    private val produtoDao by lazy {
-        AppDatabase.instancia((this)).produtoDao()
+    private val repository by lazy {
+        ProdutoRepository(
+            AppDatabase.instancia(this).produtoDao(),
+            ProdutoWebClient()
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +45,7 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
     private fun buscaProduto() {
         lifecycleScope.launch {
             produtoId?.let { id ->
-                produtoDao.buscaPorId(id).collect { produto ->
+                repository.buscaPorId(id).collect { produto ->
                     produto?.let {
                         carregaProdutoNaTela(it)
                     } ?: finish()
@@ -67,14 +72,20 @@ class DetalhesProdutoActivity : AppCompatActivity(R.layout.activity_detalhes_pro
                 }
             }
             R.id.menu_detalhes_produto_remover -> {
-                lifecycleScope.launch {
-                    produto?.let { produtoDao.remove(it) }
-                }
-                finish()
+                remove()
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun remove() {
+        lifecycleScope.launch {
+            produtoId?.let { id ->
+                repository.remove(id)
+            }
+            finish()
+        }
     }
 
     private fun carregaProdutoNaTela(produtoRecuperado: Produto) {

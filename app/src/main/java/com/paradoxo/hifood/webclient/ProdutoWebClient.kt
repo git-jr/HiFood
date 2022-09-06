@@ -3,9 +3,7 @@ package com.paradoxo.hifood.webclient
 import android.util.Log
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.webclient.model.ProdutoRequisicao
-import com.paradoxo.hifood.webclient.model.ProdutoResposta
 import com.paradoxo.hifood.webclient.services.ProdutoService
-import retrofit2.Call
 
 private const val TAG = "ProdutoWebClient"
 
@@ -17,14 +15,13 @@ class ProdutoWebClient {
     suspend fun buscaTodos(): List<Produto?> {
 
         return try {
-            val produtoResposta = produtoService
+            val produtosResposta = produtoService
                 .buscaTodas()
 
-            Log.i(TAG, "BuscaTodos:  firebase $produtoResposta")
-
-            produtoResposta.values.map { produtoResposta ->
-                produtoResposta?.produto
+            produtosResposta.map { produtoResposta ->
+                produtoResposta.value?.produto?.copy(id = produtoResposta.key)
             }
+
         } catch (e: Exception) {
             Log.i(TAG, "Erro em buscaTodos: ", e)
             emptyList()
@@ -45,6 +42,16 @@ class ProdutoWebClient {
             return (resposta.isSuccessful)
         } catch (e: Exception) {
             Log.e(TAG, "salva: falha ao tentar salvar", e)
+        }
+        return false
+    }
+
+    suspend fun remove(id: String): Boolean {
+        try {
+            produtoService.remove(id)
+            return true
+        } catch (e: Exception) {
+            Log.e(TAG, "salva: falha ao tentar deletar", e)
         }
         return false
     }

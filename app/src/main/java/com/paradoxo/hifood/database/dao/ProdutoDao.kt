@@ -14,19 +14,25 @@ interface ProdutoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun salva(produto: List<Produto?>)
 
-    @Query("SELECT * FROM Produto")
+    @Query("SELECT * FROM Produto WHERE desativado = 0")
     fun buscaTodos(): Flow<List<Produto>> // Ao usar Flow como retorno, tirar o Suspend que passa a ser "tranalho" do collect desse emit
 
-    @Query("SELECT * FROM Produto WHERE usuarioId = :usuarioId")
+    @Query("SELECT * FROM Produto WHERE usuarioId = :usuarioId AND desativado = 0")
     fun buscaTodosdDoUsuario(usuarioId: String): Flow<List<Produto>>
 
-    @Delete
-    suspend fun remove(produto: Produto)
+    @Query("DELETE FROM Produto WHERE id = :id")
+    suspend fun remove(id: String)
 
-    @Query("SELECT * FROM Produto WHERE id = :id")
+    @Query("SELECT * FROM Produto WHERE id = :id AND desativado = 0")
     fun buscaPorId(id: String): Flow<Produto?>
 
-    @Query("SELECT * FROM Produto WHERE sincronizado = 0")
+    @Query("SELECT * FROM Produto WHERE sincronizado = 0 AND desativado = 0")
     fun buscaNaoSincronizados(): Flow<List<Produto>>
+
+    @Query("UPDATE Produto SET desativado = 1 WHERE id = :id")
+    suspend fun desativa(id: String)
+
+    @Query("SELECT * FROM Produto WHERE desativado = 1")
+    fun buscaDesativado(): Flow<List<Produto>>
 
 }

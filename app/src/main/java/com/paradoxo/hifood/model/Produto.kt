@@ -18,6 +18,8 @@ data class Produto(
     val imagem: String? = null,
     val usuarioId: String? = null,
     @ColumnInfo(defaultValue = "0")
-    val sincronizado: Boolean = false
+    val sincronizado: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val desativado: Boolean = false,
 ) : Parcelable
 
