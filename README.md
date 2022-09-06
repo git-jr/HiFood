@@ -14,7 +14,7 @@
 
 ## HiFood! 
 
-O HiFood é um aplicativo que está sendo construído para estudar  e aperfeiçoar técnicas de desenvolvimento Android com Kotlin através dos cursos da Alura e outras fontes. 
+O HiFood é um aplicativo que está sendo construído para estudar e aperfeiçoar técnicas de desenvolvimento Android com Kotlin através dos cursos da Alura e outras fontes. 
 
 Qualquer semelhança do nome com outros apps que envolvam comida é mera coincidência 👀
 
@@ -23,13 +23,13 @@ Alguns dos assuntos em estudo nesse projeto:
 - [x] Layouts
 - [x] View Binding
 - [x] Higher order function
-- [x] Banco de dados com - Room 
-- [x] Operações Assíncronas - Coroutines
+- [x] Banco de dados - Room 
+- [x] Operações Assíncronas - Coroutines e Flow
 
-- [ ] Integração com Web API
+- [x] Integração com Web API - Retrofit e banco de dados não relacional do Firebase
 - [ ] MVVM
 
-
+- [ ] Migrar do Sistema de Views para Jetpack Compose
 
 
 
