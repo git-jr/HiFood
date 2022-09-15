@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,6 +19,7 @@ import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.paradoxo.hifood.ui.viewmodel.ListaProdutosViewModel
 import com.paradoxo.hifood.ui.viewmodel.factory.ListaProdutosViewModelFactory
 import com.paradoxo.hifood.webclient.ProdutoWebClient
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -39,12 +42,6 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         provedor.get(ListaProdutosViewModel::class.java)
     }
 
-//    private val repository by lazy {
-//        ProdutoRepository(
-//            AppDatabase.instancia(this).produtoDao(),
-//            ProdutoWebClient()
-//        )
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,9 +87,19 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
 
     private suspend fun buscaProdutosUsuario(usuarioId: String) {
-        viewModel.buscaTodosdDoUsuario(usuarioId).collect { produtos ->
-            adapter.atualiza(produtos)
-        }
+        viewModel.buscaTodosdDoUsuario(usuarioId).observe(this,
+            Observer { produtos ->
+                lifecycleScope.launch {
+                    produtos.collect {
+                        Log.i("teste", "Atualizando produtos livedata")
+                        adapter.atualiza(it)
+                    }
+                }
+            })
+
+//        viewModel . buscaTodosdDoUsuario (usuarioId).collect { produtos ->
+//            adapter.atualiza(produtos)
+//        }
     }
 
     private fun vaiParaFormularioProduto() {
