@@ -27,10 +27,11 @@ Alguns dos assuntos em estudo nesse projeto:
 - [x] Operações Assíncronas - Coroutines e Flow
 
 - [x] Integração com Web API - Retrofit e banco de dados não relacional do Firebase
-- [ ] MVVM
+- [x] MVVM (ViewModel
+- [ ] LiveData com Flow
 
-- [ ] Migrar do Sistema de Views para Jetpack Compose
-
+- [ ] Adicionar cores dinâmicas do Material You
+- [ ] Migrar o sistema de views para Jetpack Compose
 
 
 
