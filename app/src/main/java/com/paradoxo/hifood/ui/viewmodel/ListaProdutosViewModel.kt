@@ -1,15 +1,17 @@
 package com.paradoxo.hifood.ui.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.repository.ProdutoRepository
-import kotlinx.coroutines.flow.Flow
 
 class ListaProdutosViewModel(
     private val repository: ProdutoRepository
 ) : ViewModel() {
+
+    // Descbrir como fazer o cache correto aqui:
+    // private val produtosLiveData: LiveData<List<Produto>>
 
     suspend fun sincroniza() {
         repository.sincroniza()
@@ -19,14 +21,8 @@ class ListaProdutosViewModel(
         repository.buscaTodos()
     }
 
-    fun buscaTodosdDoUsuario(usuarioId: String): LiveData<Flow<List<Produto>>> {
-        return repository.buscaTodosDoUsuario(usuarioId)
-
-        // Anotação: Acho que é melhor retornar um LiveData<List<Produto>>
-        // e usar o collect do flow aqui dentro
+    fun buscaTodosDoUsuario(usuarioId: String): LiveData<List<Produto>> {
+        return repository.buscaTodosDoUsuario(usuarioId).asLiveData()
     }
 
-//    fun buscaTodosdDoUsuario(usuarioId: String): Flow<List<Produto>> {
-//        return repository.buscaTodosdDoUsuario(usuarioId)
-//    }
 }

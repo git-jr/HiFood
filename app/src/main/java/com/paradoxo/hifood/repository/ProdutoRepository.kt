@@ -1,19 +1,18 @@
 package com.paradoxo.hifood.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 
 class ProdutoRepository(
     private val dao: ProdutoDao,
     private val webClient: ProdutoWebClient
 ) {
-    private val produtosLiveData = MutableLiveData<Flow<List<Produto>>>()
+    private val produtosFlow = MutableStateFlow<Flow<List<Produto>>>(emptyFlow())
 
     fun buscaTodos(): Flow<List<Produto>> {
         return dao.buscaTodos()
@@ -28,12 +27,9 @@ class ProdutoRepository(
         }
     }
 
-    fun buscaTodosDoUsuario(usuarioId: String): LiveData<Flow<List<Produto>>> {
-        produtosLiveData.value = dao.buscaTodosdDoUsuario(usuarioId)
-        return produtosLiveData
-
-        // Anotação: Acho que é melhor retornar um LiveData<List<Produto>>
-        // e usar o collect do flow aqui dentro
+    fun buscaTodosDoUsuario(usuarioId: String): Flow<List<Produto>> {
+        produtosFlow.value = dao.buscaTodosdDoUsuario(usuarioId)
+        return produtosFlow.value
     }
 
     fun buscaPorId(id: String): Flow<Produto?> {
