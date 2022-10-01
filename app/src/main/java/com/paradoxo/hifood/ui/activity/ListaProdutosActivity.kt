@@ -18,6 +18,7 @@ import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.paradoxo.hifood.ui.viewmodel.ListaProdutosViewModel
 import com.paradoxo.hifood.ui.viewmodel.factory.ListaProdutosViewModelFactory
 import com.paradoxo.hifood.webclient.ProdutoWebClient
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -84,15 +85,19 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
     }
 
 
-    private fun buscaProdutosUsuario(usuarioId: String) {
-        viewModel.buscaTodosDoUsuarioLiveData(usuarioId).observe(this,
-            Observer { produtos ->
-                lifecycleScope.launch {
-                    Log.i("teste", "Atualizando produtos livedata")
-                    adapter.atualiza(produtos)
-                }
-            })
-
+    private suspend fun buscaProdutosUsuario(usuarioId: String) {
+        viewModel.buscaTodosDoUsuarioSoFlow(usuarioId).collect { produtos ->
+            Log.i("teste", "Atualizando produtos Flow")
+            adapter.atualiza(produtos)
+        }
+//
+//        viewModel.buscaTodosDoUsuarioLiveData(usuarioId).observe(this,
+//            Observer { produtos ->
+//                lifecycleScope.launch {
+//                    Log.i("teste", "Atualizando produtos livedata")
+//                    adapter.atualiza(produtos)
+//                }
+//            })
     }
 
     private fun vaiParaFormularioProduto() {
