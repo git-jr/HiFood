@@ -85,7 +85,7 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
 
 
     private fun buscaProdutosUsuario(usuarioId: String) {
-        viewModel.buscaTodosDoUsuario(usuarioId)?.observe(this,
+        viewModel.buscaTodosDoUsuarioLiveData(usuarioId).observe(this,
             Observer { produtos ->
                 lifecycleScope.launch {
                     Log.i("teste", "Atualizando produtos livedata")

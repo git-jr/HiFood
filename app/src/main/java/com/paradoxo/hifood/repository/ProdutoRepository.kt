@@ -32,6 +32,10 @@ class ProdutoRepository(
         return produtosFlow.value
     }
 
+    suspend fun buscaTodosdDoUsuarioSemFlow(usuarioId: String): List<Produto> {
+        return dao.buscaTodosdDoUsuarioSemFlow(usuarioId)
+    }
+
     fun buscaPorId(id: String): Flow<Produto?> {
         return dao.buscaPorId(id)
     }

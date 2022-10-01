@@ -1,17 +1,16 @@
 package com.paradoxo.hifood.ui.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.repository.ProdutoRepository
+import kotlinx.coroutines.launch
 
 class ListaProdutosViewModel(
     private val repository: ProdutoRepository
 ) : ViewModel() {
 
-    // Descbrir como fazer o cache correto aqui:
-    // private val produtosLiveData: LiveData<List<Produto>>
+    private val _produtosLiveData = MutableLiveData<List<Produto>>()
+    val produtosLiveData = _produtosLiveData
 
     suspend fun sincroniza() {
         repository.sincroniza()
@@ -21,7 +20,14 @@ class ListaProdutosViewModel(
         repository.buscaTodos()
     }
 
-    fun buscaTodosDoUsuario(usuarioId: String): LiveData<List<Produto>> {
+    fun buscaTodosDoUsuarioLiveData(usuarioId: String): LiveData<List<Produto>> {
+        viewModelScope.launch {
+            _produtosLiveData.postValue(repository.buscaTodosdDoUsuarioSemFlow(usuarioId))
+        }
+        return produtosLiveData
+    }
+
+    fun buscaTodosDoUsuarioFlowAsFlow(usuarioId: String): LiveData<List<Produto>> {
         return repository.buscaTodosDoUsuario(usuarioId).asLiveData()
     }
 

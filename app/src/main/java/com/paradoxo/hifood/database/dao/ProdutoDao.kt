@@ -20,6 +20,9 @@ interface ProdutoDao {
     @Query("SELECT * FROM Produto WHERE usuarioId = :usuarioId AND desativado = 0")
     fun buscaTodosdDoUsuario(usuarioId: String): Flow<List<Produto>>
 
+    @Query("SELECT * FROM Produto WHERE usuarioId = :usuarioId AND desativado = 0")
+    suspend fun buscaTodosdDoUsuarioSemFlow(usuarioId: String): List<Produto>
+
     @Query("DELETE FROM Produto WHERE id = :id")
     suspend fun remove(id: String)
 
