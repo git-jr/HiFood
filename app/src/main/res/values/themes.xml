@@ -17,7 +17,10 @@
 
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
 
-        <item name="TextColorPreco">@color/colorPrimary</item>
+        <item name="textColorPreco">@color/white</item>
+        <item name="backgroundTextColorPreco">@color/colorPrimary</item>
+
+        <item name="actionBarTheme">@style/newAppBarTheme</item>
 
         <item name="android:fontFamily">@font/montserrat_alternates</item>
     </style>
@@ -26,4 +29,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="newAppBarTheme" parent="Theme.HiFood">
+        <item name="colorSurface">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
+
 </resources>

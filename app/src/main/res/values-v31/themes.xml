@@ -2,6 +2,17 @@
 <resources>
 
     <style name="Theme.HiFood" parent="Theme.Material3.DayNight">
-        <item name="TextColorPreco">@android:color/system_accent1_600</item>
+        <item name="textColorPreco">@android:color/system_accent1_700</item>
+        <item name="backgroundTextColorPreco">@android:color/system_accent1_100</item>
+
+        <item name="actionBarTheme">@style/newAppBarTheme</item>
     </style>
+
+    <style name="newAppBarTheme" parent="Theme.HiFood">
+        <item name="colorSurface">@android:color/system_accent1_100</item>
+        <item name="colorOnSurface">@android:color/system_accent1_900</item>
+    </style>
+
+<!--    <style name="AppTheme.Overlay" parent="ThemeOverlay.Material3.DynamicColors.Light">-->
+<!--    </style>-->
 </resources>
