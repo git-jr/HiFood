@@ -17,6 +17,8 @@
 
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
 
+        <item name="TextColorPreco">@color/colorPrimary</item>
+
         <item name="android:fontFamily">@font/montserrat_alternates</item>
     </style>
 
