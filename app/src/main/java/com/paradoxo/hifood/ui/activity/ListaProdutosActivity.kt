@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.database.AppDatabase
 import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
+import com.paradoxo.hifood.extensions.vaiPara
 import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
 import com.paradoxo.hifood.ui.viewmodel.ListaProdutosViewModel
@@ -47,6 +48,8 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
         setContentView(binding.root)
         configuraRecyclerView()
         configuraFab()
+
+        vaiPara(ListaProdutosComposeActivity::class.java)
 
         lifecycleScope.launch {
             launch {
@@ -101,7 +104,7 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
     }
 
     private fun vaiParaFormularioProduto() {
-        val intent = Intent(this, FormularioProdutoActivity::class.java)
+        val intent = Intent(this, ListaProdutosComposeActivity::class.java)
         startActivity(intent)
     }
 

@@ -16,6 +16,15 @@
         android:theme="@style/Theme.HiFood"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.ListaProdutosComposeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_lista_produtos_compose"
+            android:theme="@style/Theme.HiFood">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ui.activity.LoginActivity"
             android:theme="@style/Theme.HiFood.NoActionBar" />
         <activity

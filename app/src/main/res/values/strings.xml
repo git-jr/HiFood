@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">HiFood</string>
+    <string name="title_activity_lista_produtos_compose">ListaProdutosComposeActivity</string>
+    <string name="novo_produto">NOVO PRODUTO</string>
 </resources>
