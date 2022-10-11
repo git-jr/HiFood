@@ -28,9 +28,9 @@ Alguns dos assuntos em estudo nesse projeto:
 
 - [x] Integração com Web API - Retrofit e banco de dados não relacional do Firebase
 - [x] MVVM (ViewModel
-- [ ] LiveData com Flow
+- [x] LiveData com Flow
 
-- [ ] Adicionar cores dinâmicas do Material You
+- [x] Adicionar cores dinâmicas do Material You
 - [ ] Migrar o sistema de views para Jetpack Compose
 
 
