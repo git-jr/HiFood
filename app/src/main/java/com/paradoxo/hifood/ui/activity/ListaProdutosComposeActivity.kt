@@ -1,5 +1,6 @@
 package com.paradoxo.hifood.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,10 +31,11 @@ import coil.request.ImageRequest
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.paradoxo.hifood.R
 import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
+import com.paradoxo.hifood.extensions.vaiPara
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.sampleData.sampleDataProduct
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
-import com.paradoxo.hifood.ui.activity.ui.theme.Montserrat
+import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
 import com.paradoxo.hifood.ui.activity.ui.theme.corExataDosTextosEmView
 
 class ListaProdutosComposeActivity : ComponentActivity() {
@@ -44,43 +46,53 @@ class ListaProdutosComposeActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
-                    ProductListScreen(sampleDataProduct)
+                    ProductListScreen(
+                        sampleDataProduct,
+                        onClickItem = { produtoClicado ->
+                            vaiParaDetalhes(produtoClicado)
+                        },
+                        onClickFAB = {
+                            vaiPara(FormularioProdutoActivity::class.java)
+                        }
+                    )
                 }
             }
         }
     }
+
+    fun vaiParaDetalhes(produto: Produto) {
+        val intent = Intent(this, DetalhesProdutoComposeActivity::class.java)
+        intent.putExtra(CHAVE_PRODUTO_ID, produto.id)
+        startActivity(intent)
+    }
 }
 
+
 @Composable
-fun ProductListScreen(produtos: List<Produto>) {
-    Scaffold(
-        topBar = {
-            TopAppBarListaProdutos()
-        },
-        content = { paddingValues ->
-            ListaProdutos(
-                Modifier.padding(paddingValues),
-                produtos = produtos
+fun ProductListScreen(
+    produtos: List<Produto>,
+    onClickItem: (Produto) -> Unit,
+    onClickFAB: () -> Unit
+) {
+    Scaffold(topBar = {
+        TopAppBarListaProdutos()
+    }, content = { paddingValues ->
+        ListaProdutos(Modifier.padding(paddingValues),
+            produtos = produtos,
+            onClickItem = { produtoClicado ->
+                onClickItem(produtoClicado)
+            })
+    }, floatingActionButton = {
+        ExtendedFloatingActionButton(text = {
+            Text(
+                stringResource(id = R.string.novo_produto), fontFamily = MontserratAlternates
             )
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = {
-                    Text(
-                        stringResource(id = R.string.novo_produto),
-                        fontFamily = Montserrat
-                    )
-                },
-                icon = {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Botão adicionar novo produto"
-                    )
-                },
-                onClick = { TODO() }
+        }, icon = {
+            Icon(
+                Icons.Default.Add, contentDescription = "Botão adicionar novo produto"
             )
-        }
-    )
+        }, onClick = { onClickFAB() })
+    })
 }
 
 @Composable
@@ -89,47 +101,44 @@ private fun TopAppBarListaProdutos() {
         Text(
             text = stringResource(id = R.string.app_name),
             color = Color.White,
-            fontFamily = Montserrat
+            fontFamily = MontserratAlternates
         )
     }, actions = {
         IconButton(onClick = { TODO() }) {
             Icon(
-                Icons.Default.ExitToApp,
-                tint = Color.White,
-                contentDescription = "Icone Deslogar"
+                Icons.Default.ExitToApp, tint = Color.White, contentDescription = "Icone Deslogar"
             )
         }
     })
 }
 
-@Preview
-@Composable
-fun ProductListScreenPreview() {
-    HiFoodTheme {
-        ProductListScreen(sampleDataProduct)
-    }
-
-}
 
 @Composable
-fun ListaProdutos(modifier: Modifier = Modifier, produtos: List<Produto>) {
+fun ListaProdutos(
+    modifier: Modifier = Modifier, produtos: List<Produto>, onClickItem: (Produto) -> Unit
+) {
     LazyColumn(modifier.fillMaxSize()) {
         items(produtos) { produto ->
-            ItemProduto(produto)
+            ItemProduto(produto) { produtoClicado ->
+                onClickItem(produtoClicado)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemProduto(produto: Produto) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .height(IntrinsicSize.Max),
+fun ItemProduto(produto: Produto, onClickItem: (Produto) -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)
+        .height(IntrinsicSize.Max),
         elevation = 8.dp,
         backgroundColor = Color.White,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        onClick = {
+            onClickItem(produto)
+        }
 
     ) {
         Row {
@@ -155,8 +164,8 @@ fun ItemProduto(produto: Produto) {
                 Text(
                     text = produto.nome,
                     fontSize = 20.sp,
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = MontserratAlternates,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = corExataDosTextosEmView
@@ -164,7 +173,7 @@ fun ItemProduto(produto: Produto) {
                 Text(
                     text = produto.descricao,
                     fontSize = 14.sp,
-                    fontFamily = Montserrat,
+                    fontFamily = MontserratAlternates,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -175,8 +184,8 @@ fun ItemProduto(produto: Produto) {
                     modifier = Modifier.padding(top = 8.dp),
                     text = produto.valor.formataParaMoedaBrasileira(),
                     fontSize = 18.sp,
-                    fontFamily = Montserrat,
-                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = MontserratAlternates,
+                    fontWeight = FontWeight.Bold,
                     color = colorResource(id = android.R.color.holo_green_dark),
                 )
             }
@@ -186,9 +195,17 @@ fun ItemProduto(produto: Produto) {
 }
 
 
+@Preview
 @Composable
 fun ListaProdutosPreview() {
-    ListaProdutos(
-        produtos = sampleDataProduct
-    )
+    ListaProdutos(produtos = sampleDataProduct, onClickItem = {})
+}
+
+@Preview
+@Composable
+fun ProductListScreenPreview() {
+    HiFoodTheme {
+        ProductListScreen(sampleDataProduct, {}, {})
+    }
+
 }

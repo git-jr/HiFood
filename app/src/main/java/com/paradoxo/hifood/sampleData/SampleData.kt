@@ -15,7 +15,7 @@ val sampleDataProduct = listOf(
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ46c5O3LQEA0JF7KzWjk0bscVjg60tYmBMFg&usqp=CAU"
     ), Produto(
         "02",
-        "Banana",
+        "Morangos",
         loremIpsum100,
         BigDecimal(51),
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ46c5O3LQEA0JF7KzWjk0bscVjg60tYmBMFg&usqp=CAU"

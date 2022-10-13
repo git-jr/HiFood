@@ -19,10 +19,20 @@ val googleFontProvider = GoogleFont.Provider(
 )
 
 @OptIn(ExperimentalTextApi::class)
-val Montserrat = FontFamily(
+val MontserratAlternates = FontFamily(
     Font(
         googleFont = GoogleFont("Montserrat Alternates"),
-        fontProvider = googleFontProvider, weight = FontWeight.Normal
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Normal
+    ),
+)
+
+@OptIn(ExperimentalTextApi::class)
+val Montserrat = FontFamily(
+    Font(
+        googleFont = GoogleFont("Montserrat"),
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Bold
     ),
 )
 
