@@ -2,4 +2,7 @@
     <string name="app_name">HiFood</string>
     <string name="title_activity_lista_produtos_compose">ListaProdutosComposeActivity</string>
     <string name="novo_produto">NOVO PRODUTO</string>
+    <string name="title_activity_formulario_produto_compose">FormularioProdutoComposeActivity
+    </string>
+    <string name="cadastrar_produto">Cadastrar Produto</string>
 </resources>

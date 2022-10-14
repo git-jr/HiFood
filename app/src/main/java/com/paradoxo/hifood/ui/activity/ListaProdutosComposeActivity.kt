@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,8 +52,8 @@ class ListaProdutosComposeActivity : ComponentActivity() {
                         onClickItem = { produtoClicado ->
                             vaiParaDetalhes(produtoClicado)
                         },
-                        onClickFAB = {
-                            vaiPara(FormularioProdutoActivity::class.java)
+                        irParaCadastro = {
+                            vaiPara(FormularioProdutoComposeActivity::class.java)
                         }
                     )
                 }
@@ -72,31 +73,30 @@ class ListaProdutosComposeActivity : ComponentActivity() {
 fun ProductListScreen(
     produtos: List<Produto>,
     onClickItem: (Produto) -> Unit,
-    onClickFAB: () -> Unit
+    irParaCadastro: () -> Unit
 ) {
-    Scaffold(topBar = {
-        TopAppBarListaProdutos()
-    }, content = { paddingValues ->
-        ListaProdutos(Modifier.padding(paddingValues),
-            produtos = produtos,
-            onClickItem = { produtoClicado ->
-                onClickItem(produtoClicado)
-            })
-    }, floatingActionButton = {
-        ExtendedFloatingActionButton(text = {
-            Text(
-                stringResource(id = R.string.novo_produto), fontFamily = MontserratAlternates
-            )
-        }, icon = {
-            Icon(
-                Icons.Default.Add, contentDescription = "Botão adicionar novo produto"
-            )
-        }, onClick = { onClickFAB() })
-    })
+    Scaffold(
+        topBar = {
+            HomeAppBar()
+        },
+        content = { paddingValues ->
+            ListaProdutos(Modifier.padding(paddingValues),
+                produtos = produtos,
+                onClickItem = { produtoClicado ->
+                    onClickItem(produtoClicado)
+                })
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(text = {
+                Text(stringResource(id = R.string.novo_produto), fontFamily = MontserratAlternates)
+            }, icon = {
+                Icon(Icons.Default.Add, contentDescription = "Botão adicionar novo produto")
+            }, onClick = irParaCadastro)
+        })
 }
 
 @Composable
-private fun TopAppBarListaProdutos() {
+private fun HomeAppBar() {
     TopAppBar(title = {
         Text(
             text = stringResource(id = R.string.app_name),
@@ -106,7 +106,9 @@ private fun TopAppBarListaProdutos() {
     }, actions = {
         IconButton(onClick = { TODO() }) {
             Icon(
-                Icons.Default.ExitToApp, tint = Color.White, contentDescription = "Icone Deslogar"
+                Icons.Default.ExitToApp,
+                tint = Color.White,
+                contentDescription = "Icone Deslogar"
             )
         }
     })
@@ -126,21 +128,19 @@ fun ListaProdutos(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ItemProduto(produto: Produto, onClickItem: (Produto) -> Unit) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-        .height(IntrinsicSize.Max),
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(IntrinsicSize.Max)
+            .clickable { onClickItem(produto) },
         elevation = 8.dp,
         backgroundColor = Color.White,
         shape = RoundedCornerShape(8.dp),
-        onClick = {
-            onClickItem(produto)
-        }
 
-    ) {
+        ) {
         Row {
             AsyncImage(
                 modifier = Modifier.weight(3f),

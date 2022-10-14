@@ -104,7 +104,7 @@ class ListaProdutosActivity : UsuarioBaseActivity() {
     }
 
     private fun vaiParaFormularioProduto() {
-        val intent = Intent(this, ListaProdutosComposeActivity::class.java)
+        val intent = Intent(this, FormularioProdutoActivity::class.java)
         startActivity(intent)
     }
 

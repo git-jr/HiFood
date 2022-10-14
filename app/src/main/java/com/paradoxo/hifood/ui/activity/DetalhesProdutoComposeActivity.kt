@@ -162,7 +162,7 @@ fun DetalhesAppBar(
                     tint = Color.White
                 )
             }
-        },
+        }
     )
 }
 
