@@ -31,7 +31,8 @@ Alguns dos assuntos em estudo nesse projeto:
 - [x] LiveData com Flow
 
 - [x] Adicionar cores dinâmicas do Material You
-- [ ] Migrar o sistema de views para Jetpack Compose
+- [ ] 🚧 Migrar o sistema de views para Jetpack Compose 
+- [ ] Adicionar Material Design 3 e cores dinâmicas ao Compose
 
 
 
