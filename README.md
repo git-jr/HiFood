@@ -27,7 +27,7 @@ Alguns dos assuntos em estudo nesse projeto:
 - [x] Operações Assíncronas - Coroutines e Flow
 
 - [x] Integração com Web API - Retrofit e banco de dados não relacional do Firebase
-- [x] MVVM (ViewModel
+- [x] MVVM (ViewModel)
 - [x] LiveData com Flow
 
 - [x] Adicionar cores dinâmicas do Material You
