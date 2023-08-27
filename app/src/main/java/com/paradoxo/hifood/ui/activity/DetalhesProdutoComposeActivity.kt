@@ -42,6 +42,7 @@ import com.paradoxo.hifood.sampleData.sampleDataProduct
 import com.paradoxo.hifood.ui.activity.ui.theme.Montserrat
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
 import com.paradoxo.hifood.ui.activity.ui.theme.corExataDosTextosEmView
+import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
 
 class DetalhesProdutoComposeActivity : ComponentActivity() {
 

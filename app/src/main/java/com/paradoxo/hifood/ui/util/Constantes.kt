@@ -1,3 +1,3 @@
-package com.paradoxo.hifood.ui.activity
+package com.paradoxo.hifood.ui.util
 
 const val CHAVE_PRODUTO_ID: String = "PRODUTO_ID"

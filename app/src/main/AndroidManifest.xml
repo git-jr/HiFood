@@ -56,6 +56,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.DetalhesProdutoComposeActivity" />
+        <activity
+            android:name=".ui.activity.LoginComposeActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <meta-data
             android:name="preloaded_fonts"

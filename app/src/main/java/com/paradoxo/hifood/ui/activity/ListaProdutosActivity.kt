@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,10 +15,10 @@ import com.paradoxo.hifood.databinding.ActivityListaProdutosBinding
 import com.paradoxo.hifood.extensions.vaiPara
 import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.recyclerview.adapter.ListaProdutosAdapter
+import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
 import com.paradoxo.hifood.ui.viewmodel.ListaProdutosViewModel
 import com.paradoxo.hifood.ui.viewmodel.factory.ListaProdutosViewModelFactory
 import com.paradoxo.hifood.webclient.ProdutoWebClient
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 

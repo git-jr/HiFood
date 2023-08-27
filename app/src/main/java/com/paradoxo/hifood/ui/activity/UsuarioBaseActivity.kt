@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 
 abstract class UsuarioBaseActivity : AppCompatActivity() {
 
-
     private val usuarioDAO by lazy {
         AppDatabase.instancia(this).usuarioDao()
     }
@@ -57,7 +56,7 @@ abstract class UsuarioBaseActivity : AppCompatActivity() {
 
 
     private fun vaiParaLogin() {
-        vaiPara(LoginActivity::class.java) {
+        vaiPara(LoginComposeActivity::class.java) {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         finish()

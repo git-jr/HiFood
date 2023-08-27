@@ -13,6 +13,7 @@ import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.repository.ProdutoRepository
+import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
 import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.launch
 

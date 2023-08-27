@@ -3,12 +3,12 @@ package com.paradoxo.hifood.ui.activity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.paradoxo.hifood.database.AppDatabase
-import com.paradoxo.hifood.database.dao.ProdutoDao
 import com.paradoxo.hifood.databinding.ActivityFormularioProdutoBinding
 import com.paradoxo.hifood.extensions.tentaCarregarImagem
 import com.paradoxo.hifood.model.Produto
 import com.paradoxo.hifood.repository.ProdutoRepository
 import com.paradoxo.hifood.ui.dialog.FormularioImagemDialog
+import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
 import com.paradoxo.hifood.webclient.ProdutoWebClient
 import kotlinx.coroutines.launch
 import java.math.BigDecimal

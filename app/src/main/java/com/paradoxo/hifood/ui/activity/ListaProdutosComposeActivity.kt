@@ -38,6 +38,7 @@ import com.paradoxo.hifood.sampleData.sampleDataProduct
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
 import com.paradoxo.hifood.ui.activity.ui.theme.corExataDosTextosEmView
+import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
 
 class ListaProdutosComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
