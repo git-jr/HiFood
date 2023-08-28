@@ -1,9 +1,17 @@
 package com.paradoxo.hifood.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,12 +35,12 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,14 +57,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.paradoxo.hifood.R
+import com.paradoxo.hifood.database.AppDatabase
+import com.paradoxo.hifood.database.dao.UsuarioDao
+import com.paradoxo.hifood.extensions.toast
+import com.paradoxo.hifood.extensions.vaiPara
+import com.paradoxo.hifood.model.Usuario
+import com.paradoxo.hifood.preferences.dataStore
+import com.paradoxo.hifood.preferences.usarioLogadoPreferences
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
 
 class LoginComposeActivity : ComponentActivity() {
+
+    private val usuarioDao: UsuarioDao by lazy {
+        AppDatabase.instancia(this).usuarioDao()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -63,11 +94,17 @@ class LoginComposeActivity : ComponentActivity() {
             val viewModel = LoginScreenStateViewModel()
             val state by viewModel.uiState.collectAsState()
 
+            val context = LocalContext.current
+
             HiFoodTheme {
                 Box(
                     Modifier.safeGesturesPadding()
                 ) {
-                    if (!state.gotToFormScreen) {
+                    AnimatedVisibility(
+                        visible = !state.gotToFormScreen,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         LoginScreen(
                             onGoToFormScreen = {
                                 viewModel.goToFormScreen()
@@ -75,13 +112,19 @@ class LoginComposeActivity : ComponentActivity() {
                         )
                     }
 
-                    if (state.gotToFormScreen) {
+                    AnimatedVisibility(
+                        visible = state.gotToFormScreen,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         LoginFormScreen(
-                            state = LoginFormState(),
+                            usuarioDao = usuarioDao,
                             onBackClick = {
                                 viewModel.goToLoginScreen()
                             },
-                            onContinueClick = { /*TODO*/ }
+                            onContinueClick = {
+                                context.vaiPara(ListaProdutosActivity::class.java)
+                            }
                         )
                     }
                 }
@@ -90,9 +133,7 @@ class LoginComposeActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
-
 fun LoginScreen(
     modifier: Modifier = Modifier,
     onGoToFormScreen: () -> Unit = {}
@@ -211,21 +252,12 @@ fun LoginScreen(
 @Composable
 fun LoginFormScreen(
     modifier: Modifier = Modifier,
-    state: LoginFormState,
     onBackClick: () -> Unit = {},
-    onContinueClick: () -> Unit = {}
+    onContinueClick: () -> Unit = {},
+    viewModel: LoginFormViewModel = viewModel(),
+    usuarioDao: UsuarioDao
 ) {
-    var nameState by remember { mutableStateOf("") }
-    var emailState by remember { mutableStateOf("") }
-    var passwordState by remember { mutableStateOf("") }
-
-    var allFieldsIsOk by remember { mutableStateOf(false) }
-
-    LaunchedEffect(emailState, passwordState, nameState) {
-        allFieldsIsOk =
-            emailState.isNotBlank() && passwordState.isNotBlank() && nameState.isNotBlank()
-    }
-
+    val state by viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -258,25 +290,55 @@ fun LoginFormScreen(
                     fontFamily = MontserratAlternates,
                     fontWeight = FontWeight.Bold,
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                CustomOutlinedTextField(
-                    label = "Nome", state = nameState,
-                    onStateChange = { nameState = it }
-                )
+                AnimatedVisibility(
+                    visible = state.isFirstAccess,
+                    enter = fadeIn(tween(500)) + slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(500)
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(500)
+                    ) + fadeOut(tween(500))
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    CustomOutlinedTextField(
+                        label = "Nome", state = state.name,
+                        onStateChange = { state.onNameChange(it) }
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 CustomOutlinedTextField(
-                    label = "E-mail", state = emailState,
-                    onStateChange = { emailState = it }
+                    modifier = Modifier.animateContentSize(),
+                    label = "E-mail", state = state.email,
+                    onStateChange = { state.onEmailChange(it) }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                CustomOutlinedTextField(label = "Senha", state = passwordState,
-                    onStateChange = { passwordState = it }
+                CustomOutlinedTextField(label = "Senha", state = state.password,
+                    onStateChange = { state.onPasswordChange(it) }
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                val message =
+                    if (state.isFirstAccess) "Já tem uma conta? Faça login" else "Ainda não tem uma conta? Cadastre-se"
+                TextButton(onClick = {
+                    viewModel.showNameField()
+                }) {
+                    Text(
+                        text = message,
+                        color = colorResource(id = R.color.colorPrimaryContainer),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
             }
 
 
@@ -295,13 +357,45 @@ fun LoginFormScreen(
                         .fillMaxWidth()
                 )
                 val backgroundButtonColor =
-                    if (allFieldsIsOk) colorResource(id = R.color.colorPrimaryContainer)
+                    if (state.allFieldIsOk) colorResource(id = R.color.colorPrimaryContainer)
                     else Color(244, 244, 244)
                 val contentColorButtonColor =
-                    if (allFieldsIsOk) Color.White else Color.LightGray
+                    if (state.allFieldIsOk) Color.White else Color.LightGray
 
+                val context = LocalContext.current
+                val dataStore = context.dataStore
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        if (state.allFieldIsOk) {
+                            if (state.isFirstAccess) {
+                                viewModel.saveUser(
+                                    dataStore = dataStore,
+                                    usuarioDao = usuarioDao,
+                                    onSuccess = {
+                                        context.toast("Cadastro realizado com sucesso")
+                                        onContinueClick()
+                                    },
+                                    onError = {
+                                        context.toast("Falha ao cadastrar usuário")
+                                    },
+                                )
+                            } else {
+                                viewModel.loggin(
+                                    usuarioDao = usuarioDao,
+                                    dataStore = dataStore,
+                                    onSuccess = {
+                                        context.toast("Login realizado com sucesso")
+                                        onContinueClick()
+                                    },
+                                    onError = {
+                                        context.toast("Falha ao realizar login")
+                                    },
+                                )
+                            }
+                        } else {
+                            context.toast("Preencha todos os campos")
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -383,18 +477,111 @@ fun PreviewLoginScreen() {
 data class LoginFormState(
     val email: String = "",
     val password: String = "",
-    val emailAndPasswordIsOk: Boolean = false
+    val name: String = "",
+    val isFirstAccess: Boolean = false,
+    val allFieldIsOk: Boolean = false,
+    val onNameChange: (String) -> Unit = {},
+    val onEmailChange: (String) -> Unit = {},
+    val onPasswordChange: (String) -> Unit = {},
 )
+
+class LoginFormViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(LoginFormState())
+    val uiState: StateFlow<LoginFormState>
+        get() = _uiState.asStateFlow()
+
+    init {
+        _uiState.update { state ->
+            state.copy(
+                onNameChange = { name ->
+                    _uiState.value = _uiState.value.copy(name = name)
+                    verifyAllFieldsIsOk()
+                },
+                onEmailChange = { email ->
+                    _uiState.value = _uiState.value.copy(email = email)
+                    verifyAllFieldsIsOk()
+                },
+                onPasswordChange = { password ->
+                    _uiState.value = _uiState.value.copy(password = password)
+                    verifyAllFieldsIsOk()
+                }
+            )
+        }
+    }
+
+
+    private fun verifyAllFieldsIsOk() {
+        val checkName = _uiState.value.isFirstAccess
+        val listChecks = listOf(
+            _uiState.value.email.isNotBlank(),
+            _uiState.value.password.isNotBlank(),
+            if (checkName) _uiState.value.name.isNotBlank() else true
+        )
+
+        _uiState.value = _uiState.value.copy(
+            allFieldIsOk = listChecks.all { it }
+        )
+    }
+
+    fun showNameField() {
+        _uiState.value = _uiState.value.copy(
+            isFirstAccess = !_uiState.value.isFirstAccess,
+            name = ""
+        )
+        verifyAllFieldsIsOk()
+    }
+
+
+    fun saveUser(
+        onSuccess: () -> Unit = {},
+        onError: () -> Unit = {},
+        usuarioDao: UsuarioDao,
+        dataStore: DataStore<Preferences>
+    ) {
+        with(_uiState.value) {
+            val usuario = Usuario(email, name, password)
+            viewModelScope.launch {
+                try {
+                    usuarioDao.salva(usuario)
+                    onSuccess()
+                    loggin(dataStore = dataStore, usuarioDao = usuarioDao)
+                } catch (e: Exception) {
+                    Log.e("Cadastro Usuário", "configuraBotaoCadastrar: ", e)
+                    onError()
+                }
+            }
+        }
+    }
+
+    fun loggin(
+        onSuccess: () -> Unit = {},
+        onError: () -> Unit = {},
+        usuarioDao: UsuarioDao,
+        dataStore: DataStore<Preferences>
+    ) {
+        val usuario = _uiState.value.email
+        val senha = _uiState.value.password
+
+        viewModelScope.launch {
+            usuarioDao.autentica(usuario, senha)?.let { usuario ->
+                dataStore.edit { preferences ->
+                    preferences[usarioLogadoPreferences] = usuario.id
+                }
+                onSuccess()
+            } ?: onError()
+        }
+    }
+}
 
 
 data class LoginScreenState(
-    val email: String = "",
-    val password: String = "",
-    val emailAndPasswordIsOk: Boolean = false,
     val gotToFormScreen: Boolean = false
 )
 
 class LoginScreenStateViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(LoginScreenState())
+    val uiState = _uiState.asStateFlow()
+
     fun goToFormScreen() {
         _uiState.value = uiState.value.copy(gotToFormScreen = true)
     }
@@ -403,6 +590,4 @@ class LoginScreenStateViewModel : ViewModel() {
         _uiState.value = uiState.value.copy(gotToFormScreen = false)
     }
 
-    private val _uiState = MutableStateFlow(LoginScreenState())
-    val uiState = _uiState
 }

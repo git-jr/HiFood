@@ -5,15 +5,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -27,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.edit
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -34,11 +50,14 @@ import com.paradoxo.hifood.R
 import com.paradoxo.hifood.extensions.formataParaMoedaBrasileira
 import com.paradoxo.hifood.extensions.vaiPara
 import com.paradoxo.hifood.model.Produto
+import com.paradoxo.hifood.preferences.dataStore
+import com.paradoxo.hifood.preferences.usarioLogadoPreferences
 import com.paradoxo.hifood.sampleData.sampleDataProduct
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
 import com.paradoxo.hifood.ui.activity.ui.theme.corExataDosTextosEmView
 import com.paradoxo.hifood.ui.util.CHAVE_PRODUTO_ID
+import kotlinx.coroutines.launch
 
 class ListaProdutosComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +117,9 @@ fun ProductListScreen(
 
 @Composable
 private fun HomeAppBar() {
+
+    val dataStore = LocalContext.current.dataStore
+    val scope = rememberCoroutineScope()
     TopAppBar(title = {
         Text(
             text = stringResource(id = R.string.app_name),
@@ -105,7 +127,13 @@ private fun HomeAppBar() {
             fontFamily = MontserratAlternates
         )
     }, actions = {
-        IconButton(onClick = { TODO() }) {
+        IconButton(onClick = {
+            scope.launch {
+                dataStore.edit { preferences ->
+                    preferences.remove(usarioLogadoPreferences)
+                }
+            }
+        }) {
             Icon(
                 Icons.Default.ExitToApp,
                 tint = Color.White,
@@ -208,5 +236,4 @@ fun ProductListScreenPreview() {
     HiFoodTheme {
         ProductListScreen(sampleDataProduct, {}, {})
     }
-
 }
