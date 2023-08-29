@@ -5,6 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -20,6 +21,10 @@ private val LightColorPalette = lightColors(
     secondary = colorSecondary,
     onSecondary = colorOnSecondary,
     secondaryVariant = colorSecondaryVariant,
+
+    background = Color.White,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
 
     /* Other default colors to override
     background = Color.White,
@@ -39,6 +44,31 @@ fun HiFoodTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
 
     MaterialTheme(
         colors = colors,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
+    )
+}
+
+@Composable
+fun HiFoodTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    colorType: Color? = null,
+    content: @Composable () -> Unit
+) {
+    val colors = if (darkTheme) {
+        DarkColorPalette
+    } else {
+        LightColorPalette
+    }
+
+    val tempColor = colorType ?: colors.background
+
+    MaterialTheme(
+        colors = colors.copy(
+            background = tempColor,
+            surface = tempColor,
+        ),
         typography = Typography,
         shapes = Shapes,
         content = content

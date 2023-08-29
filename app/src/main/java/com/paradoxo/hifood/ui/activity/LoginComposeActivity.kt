@@ -1,5 +1,6 @@
 package com.paradoxo.hifood.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -55,6 +56,9 @@ class LoginComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        startActivity(Intent(this, NewHomeActivity::class.java))
+
         setContent {
             val viewModel = LoginScreenStateViewModel()
             val state by viewModel.uiState.collectAsState()
