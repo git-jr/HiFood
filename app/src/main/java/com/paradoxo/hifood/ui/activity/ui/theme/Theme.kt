@@ -51,44 +51,41 @@ fun HiFoodTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
 @Composable
 fun HiFoodTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    colorType: Color? = null,
+    backgroundColor: Color? = null,
+    onBackgroundColor: Color? = null,
+    errorColor: Color? = null,
     content: @Composable () -> Unit
 ) {
 
+    val colorScheme = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
 
-//    val view = LocalView.current
-//    if (!view.isInEditMode) {
-//        SideEffect {
-//            val window = (view.context as Activity).window
-//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-//            WindowCompat.setDecorFitsSystemWindows(window, false)
-//        }
-//    }
-
-        val colorScheme = if (darkTheme) {
-            DarkColorScheme
-        } else {
-            LightColorScheme
-        }
-
-        val backgroundColor = colorType ?: colorScheme.background
+    val colorBackground = backgroundColor ?: colorScheme.background
+    val colorOnBackground = onBackgroundColor ?: colorScheme.onBackground
+    val colorError = errorColor ?: colorScheme.error
 
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = backgroundColor.copy(alpha = 0.5f).toArgb()
-            window.navigationBarColor = backgroundColor.copy(alpha = 0.8f).toArgb()
+            window.statusBarColor = colorBackground.copy(alpha = 0.5f).toArgb()
+            window.navigationBarColor = colorBackground.copy(alpha = 0.8f).toArgb()
         }
     }
 
-        MaterialTheme(
-            colorScheme = colorScheme.copy(
-                background = backgroundColor,
-                surface = backgroundColor,
-            ),
-            typography = Typography,
-            content = content
-        )
-    }
+    MaterialTheme(
+        colorScheme = colorScheme.copy(
+            background = colorBackground,
+            onBackground = colorOnBackground,
+            error = colorError,
+
+            surface = colorBackground
+        ),
+        typography = Typography,
+        content = content
+    )
+}

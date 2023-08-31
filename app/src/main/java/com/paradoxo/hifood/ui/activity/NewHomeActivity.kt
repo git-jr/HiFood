@@ -2,7 +2,6 @@ package com.paradoxo.hifood.ui.activity
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.Animatable
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +32,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
@@ -44,7 +41,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBarDefaults.windowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,7 +56,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -80,6 +76,7 @@ import com.paradoxo.hifood.model.Store
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
 import com.paradoxo.hifood.ui.activity.ui.theme.Montserrat
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
+import com.paradoxo.hifood.ui.dynamicColors.drawbleListBanner
 
 class NewHomeActivity : ComponentActivity() {
 
@@ -95,142 +92,13 @@ class NewHomeActivity : ComponentActivity() {
                 ) {
                     MainScreen()
                 }
-            } else {
-                PalletColorScreen()
             }
         }
     }
 
-
-    @Composable
-    private fun PalletColorScreen() {
-        val defaultBackgroundColor = MaterialTheme.colorScheme.background
-        val backgroundColor = remember { Animatable(defaultBackgroundColor) }
-
-        HiFoodTheme(colorType = backgroundColor.value) {
-            Box(
-                Modifier
-                    .background(color = MaterialTheme.colorScheme.background)
-                    .fillMaxSize()
-            ) {
-                val context = LocalContext.current
-                val drawbleList = listOf(
-                    R.drawable.banner_hifood_vermelho,
-                    R.drawable.banner_hifood_roxo,
-                    R.drawable.banner_hifood_verde,
-                    R.drawable.banner_hifood_amarelo,
-                    R.drawable.banner_hifood_lilas
-                )
-                val bitmapsList = remember {
-                    drawbleList.map { BitmapFactory.decodeResource(context.resources, it) }
-                }
-
-                val palletList =
-                    remember { bitmapsList.map { Palette.from(it).generate() } }
-
-
-                val listOfColorsList: List<List<Pair<Color, String>>> = remember {
-                    palletList.map { pallete ->
-                        val colorList: List<Pair<Color, String>> =
-                            palleteToColorList(pallete)
-                        colorList
-                    }
-                }
-
-                var visibleItem by remember { mutableIntStateOf(0) }
-                val lazyColumState = rememberLazyListState()
-
-                LaunchedEffect(lazyColumState) {
-                    snapshotFlow { lazyColumState.firstVisibleItemScrollOffset }
-                        .collect {
-                            Log.d("TAG", "onCreate: ${lazyColumState.firstVisibleItemIndex}")
-                            visibleItem = lazyColumState.firstVisibleItemIndex
-                        }
-                }
-
-                val currentColorList = listOfColorsList[visibleItem]
-
-                LaunchedEffect(currentColorList) {
-                    backgroundColor.animateTo(currentColorList[5].first.copy(alpha = 0.5f))
-                }
-
-                Column {
-                    LazyRow(
-                        state = lazyColumState
-                    ) {
-                        item {
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                        items(drawbleList) { drawble ->
-                            Box(
-                                Modifier.padding(8.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(drawble),
-                                    contentDescription = "HiFood Logo",
-                                    modifier = Modifier
-                                        .height(150.dp),
-                                    contentScale = ContentScale.FillHeight
-                                )
-                            }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                    }
-
-                    Crossfade(
-                        targetState = currentColorList,
-                        label = "chage color list",
-                        animationSpec = tween(500)
-                    ) { currentColorListState ->
-                        LazyColumn(
-                            modifier = Modifier
-                                .defaultMinSize(minHeight = 200.dp)
-                                .fillMaxWidth()
-                                .background(color = Color.Red),
-                            content = {
-                                items(currentColorListState) { color ->
-                                    ColorItem(color = color.first, colorName = color.second)
-                                }
-                            })
-                    }
-                }
-            }
-
-
-            Row(
-                Modifier
-                    .height(90.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Absolute.SpaceAround,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_home_fill),
-                    contentDescription = "ic_home_fill",
-                    tint = backgroundColor.value,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(48.dp),
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_home_outlined),
-                    contentDescription = "ic_home_outlined",
-                    tint = backgroundColor.value,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(48.dp),
-                )
-            }
-        }
-    }
 }
 
-private fun palleteToColorList(palette: Palette): List<Pair<Color, String>> {
-
+private fun getPaletteColorList(palette: Palette) = run {
     val properties = listOf(
         "lightVibrantSwatch",
         "darkVibrantSwatch",
@@ -240,7 +108,7 @@ private fun palleteToColorList(palette: Palette): List<Pair<Color, String>> {
         "vibrantSwatch"
     )
 
-    val colorList = properties.map {
+    properties.map {
         val swatch = when (it) {
             "lightVibrantSwatch" -> palette.lightVibrantSwatch
             "darkVibrantSwatch" -> palette.darkVibrantSwatch
@@ -254,7 +122,6 @@ private fun palleteToColorList(palette: Palette): List<Pair<Color, String>> {
         Pair(swatch?.let { currentColor -> Color(currentColor.rgb) }
             ?: Color.Black, it)
     }.toMutableList()
-    return colorList
 }
 
 
@@ -282,9 +149,37 @@ fun ColorItem(color: Color, colorName: String) {
 @Composable
 private fun MainScreen() {
     val defaultBackgroundColor = MaterialTheme.colorScheme.background
-    val backgroundColor = remember { Animatable(defaultBackgroundColor) }
+    val defaultOnBackgroundColor = MaterialTheme.colorScheme.onBackground
+    val defaultErrorColor = MaterialTheme.colorScheme.error
 
-    HiFoodTheme(colorType = backgroundColor.value) {
+    val backgroundColor = remember { Animatable(defaultBackgroundColor) }
+    val onBackgroundColor = remember { Animatable(defaultOnBackgroundColor) }
+    val errorColor = remember { Animatable(defaultErrorColor) }
+
+    val context = LocalContext.current
+
+    val bitmapsList = remember {
+        drawbleListBanner.map { BitmapFactory.decodeResource(context.resources, it) }
+    }
+
+    val palletList = remember { bitmapsList.map { Palette.from(it).generate() } }
+
+    val listOfColorsList: List<List<Pair<Color, String>>> = remember {
+        palletList.map { pallete ->
+            val colorList: List<Pair<Color, String>> =
+                getPaletteColorList(pallete)
+            colorList
+        }
+    }
+
+    var visibleItemPager by remember { mutableIntStateOf(0) }
+    val currentColorList = listOfColorsList[visibleItemPager]
+
+    HiFoodTheme(
+        backgroundColor = backgroundColor.value,
+        onBackgroundColor = onBackgroundColor.value,
+        errorColor = errorColor.value
+    ) {
         Scaffold(
             bottomBar = {
                 CustomNavigationBar()
@@ -324,9 +219,9 @@ private fun MainScreen() {
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Notifications,
+                                imageVector = Icons.Outlined.Notifications,
                                 contentDescription = "Expandir lista de endereções",
-                                tint = Color.Red
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                         Box(
@@ -334,7 +229,9 @@ private fun MainScreen() {
                                 .size(28.dp),
                             contentAlignment = Alignment.TopEnd,
                         ) {
-                            Badge {
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.error
+                            ) {
                                 Text(text = "1")
                             }
                         }
@@ -346,43 +243,17 @@ private fun MainScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        paddingValues = paddingValues,
-                    )
+                    .padding(paddingValues)
             ) {
                 Box {
-                    val context = LocalContext.current
-                    val drawbleList = listOf(
-                        R.drawable.banner_hifood_vermelho,
-                        R.drawable.banner_hifood_roxo,
-                        R.drawable.banner_hifood_verde,
-                        R.drawable.banner_hifood_amarelo,
-                        R.drawable.banner_hifood_lilas
-                    )
-                    val bitmapsList = remember {
-                        drawbleList.map { BitmapFactory.decodeResource(context.resources, it) }
-                    }
-
-                    val palletList = remember { bitmapsList.map { Palette.from(it).generate() } }
-
-
-                    val listOfColorsList: List<List<Pair<Color, String>>> = remember {
-                        palletList.map { pallete ->
-                            val colorList: List<Pair<Color, String>> =
-                                palleteToColorList(pallete)
-                            colorList
-                        }
-                    }
-
-                    var visibleItemPager by remember { mutableIntStateOf(0) }
-                    val currentColorList = listOfColorsList[visibleItemPager]
-
                     LaunchedEffect(currentColorList) {
-                        backgroundColor.animateTo(currentColorList[5].first.copy(alpha = 0.5f))
+                        backgroundColor.animateTo(currentColorList[5].first.copy(alpha = 0.5f)) // 5 is the index of vibrantSwatch
+                        onBackgroundColor.animateTo(currentColorList[1].first) // 1 is the index of darkVibrantSwatch
+                        errorColor.animateTo(currentColorList[4].first) // 4 is the index of mutedSwatch
                     }
-                    val pageCount = drawbleList.size
+                    val pageCount = drawbleListBanner.size
                     val pagerState = rememberPagerState(pageCount = {
-                        drawbleList.size
+                        drawbleListBanner.size
                     })
 
                     LaunchedEffect(pagerState.currentPage) {
@@ -403,7 +274,6 @@ private fun MainScreen() {
                             .verticalScroll(verticalScrollState)
                             .fillMaxWidth(),
                     ) {
-                        // ContentTypes(Modifier.padding(vertical = 16.dp))
                         GridContentTypes(Modifier.padding(8.dp))
 
                         HorizontalPager(
@@ -415,7 +285,7 @@ private fun MainScreen() {
                         ) { page ->
                             Box {
                                 Image(
-                                    painter = painterResource(drawbleList[page]),
+                                    painter = painterResource(drawbleListBanner[page]),
                                     contentDescription = "banner",
                                     modifier = Modifier
                                         .padding(horizontal = 8.dp)
@@ -433,7 +303,9 @@ private fun MainScreen() {
                         ) {
                             repeat(pageCount) { iteration ->
                                 val color =
-                                    if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                                    if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
+                                        alpha = 0.5f
+                                    )
                                 Box(
                                     modifier = Modifier
                                         .padding(2.dp)
@@ -474,23 +346,21 @@ private fun MainScreen() {
                         ) { StoreList(stores.takeLast(3)) }
 
 
-//                        Crossfade(
-//                            targetState = currentColorList,
-//                            label = "chage color list",
-//                            animationSpec = tween(500)
-//                        ) { currentColorListState ->
-//                            LazyColumn(
-//                                modifier = Modifier
-//                                    .defaultMinSize(minHeight = 200.dp)
-//                                    .fillMaxWidth()
-//                                    .background(color = Color.Red),
-//                                content = {
-//                                    items(currentColorListState) { color ->
-//                                        ColorItem(color = color.first, colorName = color.second)
-//                                    }
-//                                })
-//                        }
-
+                        Crossfade(
+                            targetState = currentColorList,
+                            label = "change color list",
+                            animationSpec = tween(500)
+                        ) { currentColorListState ->
+                            LazyColumn(
+                                modifier = Modifier
+                                    .height(500.dp)
+                                    .fillMaxWidth(),
+                                content = {
+                                    items(currentColorListState) { color ->
+                                        ColorItem(color = color.first, colorName = color.second)
+                                    }
+                                })
+                        }
                     }
                 }
             }
@@ -540,29 +410,23 @@ private fun CustomNavigationBar() {
                         contentAlignment = Alignment.TopEnd,
                     ) {
                         Icon(
-                            icon,
+                            painter = icon,
                             contentDescription = null,
                             modifier = Modifier
                                 .size(32.dp)
                                 .alpha(
                                     if (isSelected) 1f else 0.5f
-                                )
+                                ),
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
 
-                        if (screen.route == screenItems.last().route) {
+                        if (screen.route == screenItems[2].route) {
                             Badge(
-                                containerColor = Color.White,
+                                containerColor = MaterialTheme.colorScheme.error,
                             ) {
                                 Box(
                                     contentAlignment = Alignment.Center,
-                                    modifier = Modifier
-                                        .background(Color.Red, CircleShape)
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .background(Color.Red, CircleShape)
-                                    )
                                     Box(
                                         modifier = Modifier
                                             .size(4.dp)
@@ -575,7 +439,7 @@ private fun CustomNavigationBar() {
 
                     Text(
                         text = screen.route,
-                        fontSize = 8.sp,
+                        fontSize = 10.sp,
                         fontFamily = MontserratAlternates,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -614,7 +478,7 @@ fun GridContentTypes(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(12.dp)
@@ -694,106 +558,17 @@ private fun TextMoreContainer(text: String, onClick: () -> Unit = {}) {
 
         Text(
             text = "Ver mais",
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             fontFamily = MontserratAlternates,
-            color = MaterialTheme.colorScheme.error,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier
+                .clickable {
+                    onClick()
+                }
         )
     }
 }
 
-@Composable
-private fun ContentTypes(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .height(80.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Absolute.SpaceAround,
-    ) {
-        Row(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-//                    color = Color(244, 244, 244, 255),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-                .fillMaxHeight(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "Restaurantes",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 12.sp,
-                fontFamily = MontserratAlternates,
-                fontWeight = FontWeight.Bold,
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-            Image(
-                painterResource(id = R.drawable.produto_1),
-                contentDescription = "Imagem comidas",
-                modifier = Modifier
-                    .size(42.dp),
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .background(
-                    color = Color(244, 244, 244, 255),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painterResource(id = R.drawable.produto_1),
-                contentDescription = "Imagem bebidas",
-                modifier = Modifier
-                    .size(42.dp),
-            )
-
-            Text(
-                text = "Bebidas",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 12.sp,
-                fontFamily = MontserratAlternates,
-                fontWeight = FontWeight.Bold,
-            )
-
-        }
-
-        Column(
-            modifier = Modifier
-                .background(
-                    color = Color(244, 244, 244, 255),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painterResource(id = R.drawable.produto_1),
-                contentDescription = "Imagem itens de compras",
-                modifier = Modifier
-                    .size(42.dp),
-            )
-
-            Text(
-                text = "Shopping",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 12.sp,
-                fontFamily = MontserratAlternates,
-                fontWeight = FontWeight.Bold,
-            )
-
-        }
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
