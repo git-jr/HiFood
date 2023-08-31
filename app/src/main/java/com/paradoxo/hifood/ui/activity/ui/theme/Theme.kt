@@ -2,15 +2,14 @@ package com.paradoxo.hifood.ui.activity.ui.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple200,
@@ -55,6 +54,8 @@ fun HiFoodTheme(
     colorType: Color? = null,
     content: @Composable () -> Unit
 ) {
+
+
 //    val view = LocalView.current
 //    if (!view.isInEditMode) {
 //        SideEffect {
@@ -64,52 +65,30 @@ fun HiFoodTheme(
 //        }
 //    }
 
-    val colorScheme = if (darkTheme) {
-        DarkColorScheme
-    } else {
-        LightColorScheme
-    }
+        val colorScheme = if (darkTheme) {
+            DarkColorScheme
+        } else {
+            LightColorScheme
+        }
 
-    val backgroundColor = colorType ?: colorScheme.background
+        val backgroundColor = colorType ?: colorScheme.background
 
-    MaterialTheme(
-        colorScheme = colorScheme.copy(
-            background = backgroundColor,
-            surface = backgroundColor,
-        ),
-        typography = Typography,
-        content = content
-    )
-}
 
-// HiFoodThemeDynamicColor
-@Composable
-fun HiFoodThemeDynamicColor(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    colorType: Color? = null,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-            WindowCompat.setDecorFitsSystemWindows(window, false)
+            window.statusBarColor = backgroundColor.copy(alpha = 0.5f).toArgb()
+            window.navigationBarColor = backgroundColor.copy(alpha = 0.8f).toArgb()
         }
     }
 
-    val tempColor = colorType ?: colors.background
-
-    MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(
-            background = tempColor,
-            surface = tempColor,
-        ),
-        typography = Typography,
-        content = content
-    )
-}
+        MaterialTheme(
+            colorScheme = colorScheme.copy(
+                background = backgroundColor,
+                surface = backgroundColor,
+            ),
+            typography = Typography,
+            content = content
+        )
+    }

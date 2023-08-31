@@ -5,13 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,9 +22,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -43,6 +46,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Badge
+import androidx.compose.material3.BottomAppBarDefaults.windowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -52,11 +56,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -79,7 +85,6 @@ class NewHomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         setContent {
             val inTest = true
@@ -114,7 +119,7 @@ class NewHomeActivity : ComponentActivity() {
                     R.drawable.banner_hifood_roxo,
                     R.drawable.banner_hifood_verde,
                     R.drawable.banner_hifood_amarelo,
-                    R.drawable.banner_hifood_violeta
+                    R.drawable.banner_hifood_lilas
                 )
                 val bitmapsList = remember {
                     drawbleList.map { BitmapFactory.decodeResource(context.resources, it) }
@@ -133,7 +138,6 @@ class NewHomeActivity : ComponentActivity() {
                 }
 
                 var visibleItem by remember { mutableIntStateOf(0) }
-
                 val lazyColumState = rememberLazyListState()
 
                 LaunchedEffect(lazyColumState) {
@@ -236,7 +240,6 @@ private fun palleteToColorList(palette: Palette): List<Pair<Color, String>> {
         "vibrantSwatch"
     )
 
-
     val colorList = properties.map {
         val swatch = when (it) {
             "lightVibrantSwatch" -> palette.lightVibrantSwatch
@@ -283,71 +286,16 @@ private fun MainScreen() {
 
     HiFoodTheme(colorType = backgroundColor.value) {
         Scaffold(
-            bottomBar = {}
-//            topBar = {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(end = 16.dp, start = 16.dp, top = 8.dp)
-//                        .safeDrawingPadding(),
-//                    contentAlignment = Alignment.CenterEnd
-//                ) {
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.Center,
-//                        verticalAlignment = Alignment.CenterVertically,
-//                    ) {
-//                        Text(
-//                            text = "R.Teste, 123",
-//                            fontSize = 16.sp,
-//                            fontFamily = MontserratAlternates,
-//                            fontWeight = FontWeight.Bold
-//                        )
-//                        Icon(
-//                            imageVector = Icons.Default.KeyboardArrowDown,
-//                            contentDescription = "Expandir lista de endereções",
-//                            tint = Color.Red,
-//                        )
-//                    }
-//
-//                    Box {
-//                        Box(
-//                            modifier = Modifier
-//                                .size(28.dp),
-//                            contentAlignment = Alignment.Center,
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Default.Notifications,
-//                                contentDescription = "Expandir lista de endereções",
-//                                tint = Color.Red
-//                            )
-//                        }
-//                        Box(
-//                            modifier = Modifier
-//                                .size(28.dp),
-//                            contentAlignment = Alignment.TopEnd,
-//                        ) {
-//                            Badge {
-//                                Text(text = "1")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-        ) { paddingValues ->
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        paddingValues = paddingValues,
-                    )
-            ) {
+            bottomBar = {
+                CustomNavigationBar()
+            },
+            topBar = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .heightIn(max = 56.dp)
+                        .padding(end = 16.dp, start = 16.dp, top = 8.dp)
+                        .safeDrawingPadding(),
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     Row(
@@ -392,7 +340,16 @@ private fun MainScreen() {
                         }
                     }
                 }
+            }
+        ) { paddingValues ->
 
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        paddingValues = paddingValues,
+                    )
+            ) {
                 Box {
                     val context = LocalContext.current
                     val drawbleList = listOf(
@@ -400,7 +357,7 @@ private fun MainScreen() {
                         R.drawable.banner_hifood_roxo,
                         R.drawable.banner_hifood_verde,
                         R.drawable.banner_hifood_amarelo,
-                        R.drawable.banner_hifood_violeta
+                        R.drawable.banner_hifood_lilas
                     )
                     val bitmapsList = remember {
                         drawbleList.map { BitmapFactory.decodeResource(context.resources, it) }
@@ -432,9 +389,18 @@ private fun MainScreen() {
                         visibleItemPager = pagerState.currentPage
                     }
 
+                    val verticalScrollState = rememberScrollState()
+
+//                    LaunchedEffect(verticalScrollState.value) {
+//                        // detect scroll to top
+//                        if (verticalScrollState.value == 0) {
+//                            backgroundColor.animateTo(defaultBackgroundColor)
+//                        }
+//                    }
+
                     Column(
                         modifier = Modifier
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(verticalScrollState)
                             .fillMaxWidth(),
                     ) {
                         // ContentTypes(Modifier.padding(vertical = 16.dp))
@@ -481,29 +447,31 @@ private fun MainScreen() {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         val stores = listOf(
-                            Store(name = "Andréa Doces e Salgados", image = R.drawable.produto_1),
-                            Store(name = "Burger Rei", image = R.drawable.produto_1),
-                            Store(name = "Mc Dugooes", image = R.drawable.produto_1),
-                            Store(name = "StarButs", image = R.drawable.produto_1),
-                            Store(name = "Sanches", image = R.drawable.produto_1),
+                            Store(name = "Burger Rei", image = R.drawable.logo_stores_burger),
+                            Store(name = "Mc Dugooes", image = R.drawable.logo_stores_mc),
+                            Store(name = "StarButs", image = R.drawable.logo_stores_coffee),
+                            Store(name = "Sanches", image = R.drawable.logo_stores_sanches),
+                            Store(
+                                name = "Fabrica do Cheesecake",
+                                image = R.drawable.logo_stores_cake
+                            ),
                         )
 
-                        // Titulo Cupom e entrega gratis
+
                         TextMoreContainer("Cupom e entrega gratis")
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp)
-                        ) { StoreList(stores.shuffled()) }
+                        ) { StoreList(stores.take(2)) }
 
 
-                        // ultimas lojas
                         TextMoreContainer("Ultimas lojas")
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp),
-                        ) { StoreList(stores.shuffled()) }
+                        ) { StoreList(stores.takeLast(3)) }
 
 
 //                        Crossfade(
@@ -531,12 +499,106 @@ private fun MainScreen() {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CustomNavigationBar() {
+    // Default NavigationBar not be used because ColorIndicator not be disable properly to simulate original aspect
+
+    var currentDestination by remember { mutableStateOf(screenItems.first().route) }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(windowInsets)
+            .height(80.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        val currentWidthScreen = LocalContext.current.resources.displayMetrics.widthPixels.dp.value
+
+        screenItems.forEach { screen ->
+            val isSelected = currentDestination == screen.route
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width((currentWidthScreen / (screenItems.size * 4)).dp)
+                    .clickable {
+                        currentDestination = screen.route
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                screen.resourceId?.let { assetIcon ->
+                    val icon = painterResource(
+                        id = if (isSelected) {
+                            assetIcon.first
+                        } else {
+                            assetIcon.second
+                        },
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp),
+                        contentAlignment = Alignment.TopEnd,
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .alpha(
+                                    if (isSelected) 1f else 0.5f
+                                )
+                        )
+
+                        if (screen.route == screenItems.last().route) {
+                            Badge(
+                                containerColor = Color.White,
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .background(Color.Red, CircleShape)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(10.dp)
+                                            .background(Color.Red, CircleShape)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(4.dp)
+                                            .background(Color.White, CircleShape)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = screen.route,
+                        fontSize = 8.sp,
+                        fontFamily = MontserratAlternates,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                    )
+
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
 fun GridContentTypes(modifier: Modifier = Modifier) {
     val types = listOf(
-        Pair("Restaurantes", R.drawable.produto_1),
-        Pair("Mercado", R.drawable.produto_1),
-        Pair("Bebidas", R.drawable.produto_1),
-        Pair("Shopping", R.drawable.produto_1),
+        Pair("Restaurantes", R.drawable.content_type_restaurante),
+        Pair("Mercado", R.drawable.content_type_mercado),
+        Pair("Bebidas", R.drawable.content_type_bebidas),
+        Pair("Shopping", R.drawable.content_type_shopping),
     )
 
     LazyVerticalGrid(
@@ -552,7 +614,7 @@ fun GridContentTypes(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .background(
-                        color = Color(239, 44, 44, 255),
+                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
                         shape = RoundedCornerShape(8.dp)
                     )
                     .padding(12.dp)
@@ -738,3 +800,24 @@ private fun ContentTypes(modifier: Modifier = Modifier) {
 fun MainScreenPreview() {
     MainScreen()
 }
+
+
+sealed class Destinations(val route: String, val resourceId: Pair<Int, Int>? = null) {
+    object Home : Destinations("Início", Pair(R.drawable.ic_home_fill, R.drawable.ic_home_outlined))
+
+    object Search :
+        Destinations("Busca", Pair(R.drawable.ic_search_fill, R.drawable.ic_search_outlined))
+
+    object Request :
+        Destinations("Pedidos", Pair(R.drawable.ic_request_fill, R.drawable.ic_request_outlined))
+
+    object Profile :
+        Destinations("Perfil", Pair(R.drawable.ic_profile_fill, R.drawable.ic_profile_outlined))
+}
+
+val screenItems = listOf(
+    Destinations.Home,
+    Destinations.Search,
+    Destinations.Request,
+    Destinations.Profile
+)
