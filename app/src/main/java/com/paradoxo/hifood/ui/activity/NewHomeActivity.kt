@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -76,7 +75,10 @@ import com.paradoxo.hifood.model.Store
 import com.paradoxo.hifood.ui.activity.ui.theme.HiFoodTheme
 import com.paradoxo.hifood.ui.activity.ui.theme.Montserrat
 import com.paradoxo.hifood.ui.activity.ui.theme.MontserratAlternates
+import com.paradoxo.hifood.ui.components.ColorItem
 import com.paradoxo.hifood.ui.dynamicColors.drawbleListBanner
+import com.paradoxo.hifood.ui.dynamicColors.getPaletteColorList
+import com.paradoxo.hifood.ui.navigation.screenItems
 
 class NewHomeActivity : ComponentActivity() {
 
@@ -98,54 +100,7 @@ class NewHomeActivity : ComponentActivity() {
 
 }
 
-private fun getPaletteColorList(palette: Palette) = run {
-    val properties = listOf(
-        "lightVibrantSwatch",
-        "darkVibrantSwatch",
-        "lightMutedSwatch",
-        "darkMutedSwatch",
-        "mutedSwatch",
-        "vibrantSwatch"
-    )
-
-    properties.map {
-        val swatch = when (it) {
-            "lightVibrantSwatch" -> palette.lightVibrantSwatch
-            "darkVibrantSwatch" -> palette.darkVibrantSwatch
-            "lightMutedSwatch" -> palette.lightMutedSwatch
-            "darkMutedSwatch" -> palette.darkMutedSwatch
-            "mutedSwatch" -> palette.mutedSwatch
-            "vibrantSwatch" -> palette.vibrantSwatch
-            else -> null
-        }
-
-        Pair(swatch?.let { currentColor -> Color(currentColor.rgb) }
-            ?: Color.Black, it)
-    }.toMutableList()
-}
-
-
-@Composable
-fun ColorItem(color: Color, colorName: String) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(42.dp)
-            .background(
-                color = color
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = colorName,
-            color = if (colorName == "darkMutedSwatch") Color.White else Color.Black
-        )
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MainScreen() {
     val defaultBackgroundColor = MaterialTheme.colorScheme.background
@@ -158,18 +113,10 @@ private fun MainScreen() {
 
     val context = LocalContext.current
 
-    val bitmapsList = remember {
+    val listOfColorsList = remember {
         drawbleListBanner.map { BitmapFactory.decodeResource(context.resources, it) }
-    }
-
-    val palletList = remember { bitmapsList.map { Palette.from(it).generate() } }
-
-    val listOfColorsList: List<List<Pair<Color, String>>> = remember {
-        palletList.map { pallete ->
-            val colorList: List<Pair<Color, String>> =
-                getPaletteColorList(pallete)
-            colorList
-        }
+            .map { Palette.from(it).generate() }
+            .map { getPaletteColorList(it) }
     }
 
     var visibleItemPager by remember { mutableIntStateOf(0) }
@@ -181,65 +128,13 @@ private fun MainScreen() {
         errorColor = errorColor.value
     ) {
         Scaffold(
-            bottomBar = {
-                CustomNavigationBar()
-            },
             topBar = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 56.dp)
-                        .padding(end = 16.dp, start = 16.dp, top = 8.dp)
-                        .safeDrawingPadding(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "R.Teste, 123",
-                            fontSize = 16.sp,
-                            fontFamily = MontserratAlternates,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Expandir lista de endereções",
-                            tint = Color.Red,
-                        )
-                    }
-
-                    Box {
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Notifications,
-                                contentDescription = "Expandir lista de endereções",
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(28.dp),
-                            contentAlignment = Alignment.TopEnd,
-                        ) {
-                            Badge(
-                                containerColor = MaterialTheme.colorScheme.error
-                            ) {
-                                Text(text = "1")
-                            }
-                        }
-                    }
-                }
-            }
+                CustomHomeAppBar()
+            },
+            bottomBar = {
+                CustomHomeNavigationBar()
+            },
         ) { paddingValues ->
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -274,7 +169,7 @@ private fun MainScreen() {
                             .verticalScroll(verticalScrollState)
                             .fillMaxWidth(),
                     ) {
-                        GridContentTypes(Modifier.padding(8.dp))
+                        ContentTypesGrid(Modifier.padding(8.dp))
 
                         HorizontalPager(
                             state = pagerState,
@@ -348,7 +243,7 @@ private fun MainScreen() {
 
                         Crossfade(
                             targetState = currentColorList,
-                            label = "change color list",
+                            label = "Change color list",
                             animationSpec = tween(500)
                         ) { currentColorListState ->
                             LazyColumn(
@@ -370,7 +265,63 @@ private fun MainScreen() {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun CustomNavigationBar() {
+private fun CustomHomeAppBar() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .safeDrawingPadding(),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "R.Teste, 123",
+                fontSize = 16.sp,
+                fontFamily = MontserratAlternates,
+                fontWeight = FontWeight.Bold
+            )
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = "Expandir lista de endereços",
+                tint = Color.Red,
+            )
+        }
+
+        Box {
+            Box(
+                modifier = Modifier
+                    .size(28.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Notifications,
+                    contentDescription = "Notificações",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(28.dp),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+                Badge(
+                    containerColor = MaterialTheme.colorScheme.error
+                ) {
+                    Text(text = "4")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CustomHomeNavigationBar() {
     // Default NavigationBar not be used because ColorIndicator not be disable properly to simulate original aspect
 
     var currentDestination by remember { mutableStateOf(screenItems.first().route) }
@@ -457,7 +408,7 @@ private fun CustomNavigationBar() {
 }
 
 @Composable
-fun GridContentTypes(modifier: Modifier = Modifier) {
+private fun ContentTypesGrid(modifier: Modifier = Modifier) {
     val types = listOf(
         Pair("Restaurantes", R.drawable.content_type_restaurante),
         Pair("Mercado", R.drawable.content_type_mercado),
@@ -540,7 +491,10 @@ private fun StoreList(stores: List<Store>) {
 }
 
 @Composable
-private fun TextMoreContainer(text: String, onClick: () -> Unit = {}) {
+private fun TextMoreContainer(
+    text: String,
+    onClick: () -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -577,22 +531,3 @@ fun MainScreenPreview() {
 }
 
 
-sealed class Destinations(val route: String, val resourceId: Pair<Int, Int>? = null) {
-    object Home : Destinations("Início", Pair(R.drawable.ic_home_fill, R.drawable.ic_home_outlined))
-
-    object Search :
-        Destinations("Busca", Pair(R.drawable.ic_search_fill, R.drawable.ic_search_outlined))
-
-    object Request :
-        Destinations("Pedidos", Pair(R.drawable.ic_request_fill, R.drawable.ic_request_outlined))
-
-    object Profile :
-        Destinations("Perfil", Pair(R.drawable.ic_profile_fill, R.drawable.ic_profile_outlined))
-}
-
-val screenItems = listOf(
-    Destinations.Home,
-    Destinations.Search,
-    Destinations.Request,
-    Destinations.Profile
-)
