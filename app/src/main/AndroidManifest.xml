@@ -59,7 +59,9 @@
         <activity
             android:name=".ui.activity.LoginComposeActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".ui.activity.NewHomeActivity" />
+        <activity
+            android:name=".ui.activity.NewHomeActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <meta-data
             android:name="preloaded_fonts"
